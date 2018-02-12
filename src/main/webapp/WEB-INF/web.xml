@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    <filter>
+        <filter-name>tokenAuthFilter</filter-name>
+        <filter-class>com.feiliks.testapp2.TokenAuthFilter</filter-class>
+        <init-param>
+            <param-name>protectedPaths</param-name>
+            <param-value>/**</param-value>
+        </init-param>
+        <init-param>
+            <param-name>openPaths</param-name>
+            <param-value>/app/account/login:/app/users</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>tokenAuthFilter</filter-name>
+        <url-pattern>/app/*</url-pattern>
+    </filter-mapping>
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/app-context.xml</param-value>
+    </context-param>
+    <servlet>
+        <servlet-name>app</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value/>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>app</servlet-name>
+        <url-pattern>/app/*</url-pattern>
+    </servlet-mapping>
+    <welcome-file-list>
+        <welcome-file>/app/</welcome-file>
+    </welcome-file-list>
+</web-app>
