@@ -16,6 +16,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Lob;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "rms_request")
@@ -32,16 +34,17 @@ public class Request implements Serializable {
     private Long id;
 
     @Column(nullable = false)
+    @NotNull(message = "Request title must not be null.")
     private String title;
 
     @Lob
     private String content;
 
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     @Column(nullable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date created = new Date();
 
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date modified;
 
     @ManyToOne
@@ -51,10 +54,13 @@ public class Request implements Serializable {
     @JsonIgnore
     private Set<Requirement> requirements;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
+    @NotNull(message = "Request type must not be null.")
     private RequestType requestType;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Request status must not be null.")
     private Status status;
 
     public Long getId() {

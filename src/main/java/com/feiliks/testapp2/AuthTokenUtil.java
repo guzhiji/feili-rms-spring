@@ -33,7 +33,7 @@ public class AuthTokenUtil {
 
     public static Jwt create(User u, Signer signer) throws IOException {
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.MINUTE, 1);
+        cal.add(Calendar.HOUR, 1);
         Map<String, Object> data = new HashMap<>();
         data.put("username", u.getUsername());
         data.put("hash", DigestUtils.md5Hex(String.format(

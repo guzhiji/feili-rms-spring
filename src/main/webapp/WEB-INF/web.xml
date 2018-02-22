@@ -5,6 +5,7 @@
             30
         </session-timeout>
     </session-config>
+    <!--
     <filter>
         <filter-name>tokenAuthFilter</filter-name>
         <filter-class>com.feiliks.testapp2.TokenAuthFilter</filter-class>
@@ -21,6 +22,7 @@
         <filter-name>tokenAuthFilter</filter-name>
         <url-pattern>/app/*</url-pattern>
     </filter-mapping>
+    -->
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>

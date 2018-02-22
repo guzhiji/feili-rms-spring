@@ -116,7 +116,9 @@ public class TokenAuthFilter implements Filter {
             ServletResponse response,
             FilterChain chain)
             throws IOException, ServletException {
-        if (shouldAuthenticate((HttpServletRequest) request)) {
+
+        HttpServletRequest req = (HttpServletRequest) request;
+        if (shouldAuthenticate(req)) {
             String headerName = tokenHeaderName;
             if (headerName == null) {
                 headerName = DEFAULT_TOKEN_HEADER;
@@ -124,7 +126,6 @@ public class TokenAuthFilter implements Filter {
             try {
 
                 // get token
-                HttpServletRequest req = (HttpServletRequest) request;
                 String token = req.getHeader(headerName);
                 AuthToken authentication = AuthTokenUtil.check(req, token);
 
@@ -147,6 +148,7 @@ public class TokenAuthFilter implements Filter {
         } else {
             chain.doFilter(request, response);
         }
+
     }
 
     @Override

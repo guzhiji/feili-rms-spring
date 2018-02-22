@@ -8,18 +8,24 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "rms_request_type")
 public class RequestType implements Serializable {
 
     private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(nullable = false)
+    @NotNull(message = "Request type name must not be null.")
     private String name;
+
     @ManyToOne
+    @NotNull(message = "Manager must not be null.")
     private User manager;
 
     /**

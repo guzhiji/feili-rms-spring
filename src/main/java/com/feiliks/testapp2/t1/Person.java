@@ -1,4 +1,4 @@
-package com.feiliks.testapp2;
+package com.feiliks.testapp2.t1;
 
 import javax.validation.constraints.NotNull;
 

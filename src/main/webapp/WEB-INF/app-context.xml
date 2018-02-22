@@ -71,8 +71,7 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
         <property name="entityManagerFactory" ref="entityManagerFactory" />
         <property name="persistenceUnitName" value="myUnit" />
         <property name="dataSource" ref="dataSource"/>
-    </bean>-->
-
+    </bean> -->
     <!--
     <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"/>
@@ -86,25 +85,9 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
         <property name="sshPrivateKey" value="/home/guzhiji/Projects/keys/id_rsa"/>
         <property name="sshPublicKey" value="/home/guzhiji/Projects/keys/id_rsa.pub"/>
     </bean>
-    <!--
-    <bean id="tokenAuthFilter" class="com.feiliks.testapp2.TokenAuthFilter">
-        <property name="openPaths">
-            <list>
-                <value>/account/login</value>
-                <value>/users</value>
-            </list>
-        </property>
-        <property name="protectedPaths">
-            <list>
-                <value>/**</value>
-            </list>
-        </property>
-    </bean>
-    -->
 
     <jpa:repositories base-package="com.feiliks.testapp2.jpa.repositories" />
 
-    <!--
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/**" />
@@ -113,6 +96,5 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
             <bean class="com.feiliks.testapp2.TokenAuthInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>
-    -->
     <mvc:annotation-driven />
 </beans>

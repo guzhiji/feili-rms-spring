@@ -1,4 +1,4 @@
-package com.feiliks.testapp2;
+package com.feiliks.testapp2.t1;
 
 import com.feiliks.testapp2.dto.Message;
 import java.net.URI;

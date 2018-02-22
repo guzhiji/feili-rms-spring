@@ -1,6 +1,7 @@
 package com.feiliks.testapp2.controllers;
 
 import com.feiliks.testapp2.NotFoundException;
+import com.feiliks.testapp2.ValidationException;
 import com.feiliks.testapp2.dto.EntityMessage;
 import com.feiliks.testapp2.dto.Message;
 import com.feiliks.testapp2.dto.RequestTypeDTO;
@@ -9,9 +10,11 @@ import com.feiliks.testapp2.jpa.repositories.RequestTypeRepository;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,6 +40,12 @@ public class RequestTypeController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
     }
 
+    @ExceptionHandler(ValidationException.class)
+    protected ResponseEntity<Message> handleValidationError(ValidationException ex) {
+        Message msg = new Message("failure", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(msg);
+    }
+
     @GetMapping
     public List<RequestTypeDTO> getRequestTypes() {
         List<RequestTypeDTO> out = new ArrayList<>();
@@ -48,7 +57,11 @@ public class RequestTypeController {
 
     @PostMapping
     public ResponseEntity<EntityMessage<RequestTypeDTO>> createRequestType(
-            @RequestBody RequestType requestType) {
+            @Valid @RequestBody RequestType requestType,
+            BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult);
+        }
         RequestTypeDTO out = new RequestTypeDTO(repo.save(requestType));
         UriComponents uriComponents = MvcUriComponentsBuilder.fromMethodName(
                 getClass(), "getRequestType", out.getId()).build();
@@ -60,7 +73,11 @@ public class RequestTypeController {
     @PutMapping("/{typeid}")
     public ResponseEntity<EntityMessage<RequestTypeDTO>> updateRequestType(
             @PathVariable Long typeid,
-            @RequestBody RequestType type) {
+            @Valid @RequestBody RequestType type,
+            BindingResult validationResult) {
+        if (validationResult.hasErrors()) {
+            throw new ValidationException(validationResult);
+        }
         if (!repo.exists(typeid)) {
             throw new NotFoundException(typeid.toString());
         }

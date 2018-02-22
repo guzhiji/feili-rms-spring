@@ -1,2 +1,7 @@
 target
+package.sh
+*.bak
+*~
+.*.bak
+.*~
 
