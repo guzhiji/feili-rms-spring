@@ -42,7 +42,7 @@ public class Request implements Serializable {
 
     @Column(nullable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date created = new Date();
+    private Date created;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date modified;

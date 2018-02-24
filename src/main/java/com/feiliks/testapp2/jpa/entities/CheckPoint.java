@@ -39,7 +39,7 @@ public class CheckPoint implements Serializable {
     @Column(nullable = false)
     private int daysLeft;
 
-    @ManyToOne(cascade = {CascadeType.ALL}, optional = false)
+    @ManyToOne(optional = false)
 //    @NotNull(message = "Checkpoint parent requirement must not be null.")
     private Requirement requirement;
 

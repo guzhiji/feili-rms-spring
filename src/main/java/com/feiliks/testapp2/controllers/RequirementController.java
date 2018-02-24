@@ -185,19 +185,12 @@ public class RequirementController extends AbstractController {
         }
         checkAuthorization(req, entity);
 
-        CheckPoint found = null;
-        for (CheckPoint cp : entity.getCheckPoints()) {
-            if (Objects.equals(cp.getId(), checkpointid)) {
-                found = cp;
-            }
-        }
-        if (found == null) {
-            throw new NotFoundException(checkpointid.toString());
-        }
-        entity.getCheckPoints().remove(found);
-        checkpointRepo.delete(checkpointid); // TODO
+        Collection<CheckPoint> checkpoints = entity.getCheckPoints();
+        CheckPoint d = new CheckPoint();
+        d.setId(checkpointid);
+        checkpoints.remove(d);
 
-        RequirementDTO out = new RequirementDTO(entity);
+        RequirementDTO out = new RequirementDTO(repo.save(entity));
         EntityMessage<RequirementDTO> msg = new EntityMessage<>("success", out);
         return ResponseEntity.accepted().body(msg);
     }

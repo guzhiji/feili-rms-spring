@@ -23,7 +23,7 @@ public class RequirementDTO {
 
     private int priority;
     private String content;
-    private Date created = new Date();
+    private Date created;
     private Date modified;
     private UserDTO owner;
     private Set<CheckPointDTO> checkPoints;

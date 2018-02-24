@@ -41,7 +41,7 @@ public class Requirement implements Serializable {
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
-    private Date created = new Date();
+    private Date created;
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date modified;
@@ -55,10 +55,10 @@ public class Requirement implements Serializable {
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "requirement", orphanRemoval = true)
     private Collection<CheckPoint> checkPoints;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
+    @ManyToMany
     private Collection<User> participants;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
+    @ManyToMany
     private Collection<Tag> tags;
 
     public Long getId() {

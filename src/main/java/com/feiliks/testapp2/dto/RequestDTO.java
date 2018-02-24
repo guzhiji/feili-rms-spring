@@ -14,7 +14,7 @@ public class RequestDTO {
     private String title;
 
     private String content;
-    private Date created = new Date();
+    private Date created;
     private Date modified;
     private UserDTO owner;
 
