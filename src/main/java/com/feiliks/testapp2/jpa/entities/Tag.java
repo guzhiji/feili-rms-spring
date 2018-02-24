@@ -18,7 +18,15 @@ public class Tag implements Serializable {
     private Long id;
     @Column(nullable = false, unique = true)
     private String name;
+    @Column(length = 16)
     private String color;
+
+    public Tag() {
+    }
+
+    public Tag(String t) {
+        name = t;
+    }
 
     /**
      * @return the id
@@ -65,7 +73,7 @@ public class Tag implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (name != null ? name.hashCode() : 0);
         return hash;
     }
 
@@ -76,7 +84,7 @@ public class Tag implements Serializable {
             return false;
         }
         Tag other = (Tag) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.name == null && other.name != null) || (this.name != null && !this.name.equals(other.name))) {
             return false;
         }
         return true;

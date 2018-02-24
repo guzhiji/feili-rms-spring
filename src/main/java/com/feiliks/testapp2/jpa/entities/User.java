@@ -35,17 +35,21 @@ public class User implements Serializable {
     @Size(min = 6, max = 128, message = "Length of password should be between 6 to 128.")
     private String password;
 
+    @Pattern(regexp = "^[ \\-+0-9]{3,16}$", message = "Phone number is invalid.")
     private String phone;
 
     @Pattern(regexp = "^.+@.+$", message = "Email is invalid.")
+    @Size(max = 128, message = "E-mail address must not be longer than 128.")
     private String email;
 
     @ManyToMany(mappedBy = "participants")
     @JsonIgnore
     private Set<Requirement> requirementsParticipated;
+
     @OneToMany(mappedBy = "owner")
     @JsonIgnore
     private Set<Requirement> requirementsOwned;
+
     @OneToMany(mappedBy = "owner")
     @JsonIgnore
     private Set<Request> requestsOwned;
@@ -153,22 +157,22 @@ public class User implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
+        int hash = super.hashCode();
         hash += (username != null ? username.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof User)) {
             return false;
         }
         User other = (User) object;
-        if ((this.username == null && other.username != null) || (this.username != null && !this.username.equals(other.username))) {
-            return false;
+        if (this.id == null) {
+            if (this.username == null) return super.equals(object);
+            return this.username.equals(other.username);
         }
-        return true;
+        return this.id.equals(other.id);
     }
 
     @Override

@@ -17,7 +17,6 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Lob;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "rms_request")
@@ -33,8 +32,9 @@ public class Request implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    @NotNull(message = "Request title must not be null.")
+    @Column(nullable = false, length = 127)
+//    @NotNull(message = "Request title must not be null.")
+//    @Size(min = 1, max = 127, message = "Request title is invalid (1-127 characters).")
     private String title;
 
     @Lob
@@ -55,12 +55,12 @@ public class Request implements Serializable {
     private Set<Requirement> requirements;
 
     @ManyToOne(optional = false)
-    @NotNull(message = "Request type must not be null.")
+//    @NotNull(message = "Request type must not be null.")
     private RequestType requestType;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 8)
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Request status must not be null.")
+//    @NotNull(message = "Request status must not be null.")
     private Status status;
 
     public Long getId() {

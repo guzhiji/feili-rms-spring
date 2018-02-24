@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,19 +25,13 @@ import org.apache.commons.codec.digest.DigestUtils;
 
 @RestController
 @RequestMapping("/account")
-public class AccountController {
+public class AccountController extends AbstractController {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
     private KeyPairProvider keyPairProvider;
-
-    @ExceptionHandler(ValidationException.class)
-    protected ResponseEntity<Message> handleValidationError(ValidationException ex) {
-        Message msg = new Message("failure", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(msg);
-    }
 
     @PostMapping("/login")
     public ResponseEntity<Message> login(

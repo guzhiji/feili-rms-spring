@@ -8,7 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "rms_request_type")
@@ -20,12 +19,13 @@ public class RequestType implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    @NotNull(message = "Request type name must not be null.")
+    @Column(nullable = false, length = 63)
+//    @NotNull(message = "Request type name must not be null.")
+//    @Size(min = 1, max = 63, message = "Request type name is invalid (1-63 characters).")
     private String name;
 
     @ManyToOne
-    @NotNull(message = "Manager must not be null.")
+//    @NotNull(message = "Manager must not be null.")
     private User manager;
 
     /**

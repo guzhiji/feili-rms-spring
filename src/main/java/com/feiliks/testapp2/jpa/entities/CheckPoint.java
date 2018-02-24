@@ -26,15 +26,21 @@ public class CheckPoint implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
+//    @NotNull(message = "Checkpoint description must not be null.")
+//    @Size(min = 1, max = 255, message = "Checkpoint description is invalid (1-255 characters).")
     private String description;
 
+    @Column(nullable = false, length = 8)
     @Enumerated(EnumType.STRING)
+//    @NotNull(message = "Checkpoint status must not be null.")
     private Status status;
 
+    @Column(nullable = false)
     private int daysLeft;
 
-    @ManyToOne(cascade = {CascadeType.ALL})
+    @ManyToOne(cascade = {CascadeType.ALL}, optional = false)
+//    @NotNull(message = "Checkpoint parent requirement must not be null.")
     private Requirement requirement;
 
     /**
@@ -109,22 +115,19 @@ public class CheckPoint implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 0;
+        int hash = super.hashCode();
         hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof CheckPoint)) {
             return false;
         }
+        if (this.id == null) return super.equals(object);
         CheckPoint other = (CheckPoint) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
-        }
-        return true;
+        return this.id.equals(other.id);
     }
 
     @Override

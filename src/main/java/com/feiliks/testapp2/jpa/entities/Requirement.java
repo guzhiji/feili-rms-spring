@@ -1,6 +1,7 @@
 package com.feiliks.testapp2.jpa.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -15,6 +16,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.Lob;
 import javax.persistence.OneToMany;
+import javax.persistence.TemporalType;
 
 @Entity
 @Table(name = "rms_requirement")
@@ -26,7 +28,9 @@ public class Requirement implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 127)
+//    @NotNull(message = "Requirement title must not be null.")
+//    @Size(min = 1, max = 127, message = "Requirement title is invalid (1-127 characters).")
     private String title;
 
     @Column(nullable = false)
@@ -35,11 +39,11 @@ public class Requirement implements Serializable {
     @Lob
     private String content;
 
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.TIMESTAMP)
     @Column(nullable = false)
     private Date created = new Date();
 
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.TIMESTAMP)
     private Date modified;
 
     @ManyToOne
@@ -48,14 +52,14 @@ public class Requirement implements Serializable {
     @ManyToMany
     private Set<Request> requests;
 
-    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "requirement")
-    private Set<CheckPoint> checkPoints;
+    @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "requirement", orphanRemoval = true)
+    private Collection<CheckPoint> checkPoints;
 
-    @ManyToMany
-    private Set<User> participants;
+    @ManyToMany(cascade = {CascadeType.ALL})
+    private Collection<User> participants;
 
-    @ManyToMany
-    private Set<Tag> tags;
+    @ManyToMany(cascade = {CascadeType.ALL})
+    private Collection<Tag> tags;
 
     public Long getId() {
         return id;
@@ -136,42 +140,42 @@ public class Requirement implements Serializable {
     /**
      * @return the checkPoints
      */
-    public Set<CheckPoint> getCheckPoints() {
+    public Collection<CheckPoint> getCheckPoints() {
         return checkPoints;
     }
 
     /**
      * @param checkPoints the checkPoints to set
      */
-    public void setCheckPoints(Set<CheckPoint> checkPoints) {
+    public void setCheckPoints(Collection<CheckPoint> checkPoints) {
         this.checkPoints = checkPoints;
     }
 
     /**
      * @return the participants
      */
-    public Set<User> getParticipants() {
+    public Collection<User> getParticipants() {
         return participants;
     }
 
     /**
      * @param participants the participants to set
      */
-    public void setParticipants(Set<User> participants) {
+    public void setParticipants(Collection<User> participants) {
         this.participants = participants;
     }
 
     /**
      * @return the tags
      */
-    public Set<Tag> getTags() {
+    public Collection<Tag> getTags() {
         return tags;
     }
 
     /**
      * @param tags the tags to set
      */
-    public void setTags(Set<Tag> tags) {
+    public void setTags(Collection<Tag> tags) {
         this.tags = tags;
     }
 

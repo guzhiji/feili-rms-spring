@@ -1,12 +1,20 @@
 package com.feiliks.testapp2.dto;
 
 import com.feiliks.testapp2.jpa.entities.CheckPoint;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class CheckPointDTO {
 
     private Long id;
+
+    @NotNull(message = "Checkpoint description must not be null.")
+    @Size(min = 1, max = 255, message = "Checkpoint description is invalid (1-255 characters).")
     private String description;
+
+    @NotNull(message = "Checkpoint status must not be null.")
     private CheckPoint.Status status;
+
     private int daysLeft;
 
     public CheckPointDTO() {
@@ -17,6 +25,15 @@ public class CheckPointDTO {
         description = checkPoint.getDescription();
         status = checkPoint.getStatus();
         daysLeft = checkPoint.getDaysLeft();
+    }
+
+    public CheckPoint toEntity() {
+        CheckPoint e = new CheckPoint();
+        e.setId(id);
+        e.setDescription(description);
+        e.setStatus(status);
+        e.setDaysLeft(daysLeft);
+        return e;
     }
 
     /**

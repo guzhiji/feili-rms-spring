@@ -17,4 +17,8 @@ public class ValidationException extends RuntimeException {
     public ValidationException(BindingResult result) {
         super(createMessage(result));
     }
+
+    public ValidationException(String msg) {
+        super(msg);
+    }
 }

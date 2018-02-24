@@ -1,22 +1,20 @@
 package com.feiliks.testapp2.controllers;
 
+import com.feiliks.testapp2.JpaUtils;
 import com.feiliks.testapp2.NotFoundException;
 import com.feiliks.testapp2.ValidationException;
 import com.feiliks.testapp2.dto.EntityMessage;
-import com.feiliks.testapp2.dto.Message;
 import com.feiliks.testapp2.dto.RequestTypeDTO;
 import com.feiliks.testapp2.jpa.entities.RequestType;
 import com.feiliks.testapp2.jpa.repositories.RequestTypeRepository;
-import java.net.URI;
+import com.feiliks.testapp2.jpa.repositories.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,27 +22,16 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.util.UriComponents;
 
 @RestController
 @RequestMapping("/request-types")
-public class RequestTypeController {
+public class RequestTypeController extends AbstractController {
 
     @Autowired
     private RequestTypeRepository repo;
 
-    @ExceptionHandler(NotFoundException.class)
-    protected ResponseEntity<Message> handleNotFound(NotFoundException ex) {
-        Message msg = new Message("failure", "request type not found:" + ex.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
-    }
-
-    @ExceptionHandler(ValidationException.class)
-    protected ResponseEntity<Message> handleValidationError(ValidationException ex) {
-        Message msg = new Message("failure", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(msg);
-    }
+    @Autowired
+    private UserRepository userRepo;
 
     @GetMapping
     public List<RequestTypeDTO> getRequestTypes() {
@@ -57,23 +44,23 @@ public class RequestTypeController {
 
     @PostMapping
     public ResponseEntity<EntityMessage<RequestTypeDTO>> createRequestType(
-            @Valid @RequestBody RequestType requestType,
+            @Valid @RequestBody RequestTypeDTO data,
             BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult);
         }
-        RequestTypeDTO out = new RequestTypeDTO(repo.save(requestType));
-        UriComponents uriComponents = MvcUriComponentsBuilder.fromMethodName(
-                getClass(), "getRequestType", out.getId()).build();
-        URI uri = uriComponents.encode().toUri();
-        EntityMessage<RequestTypeDTO> msg = new EntityMessage<>("success", out);
-        return ResponseEntity.created(uri).body(msg);
+
+        RequestType entity = data.toEntity();
+        JpaUtils.fetchManager(userRepo, entity);
+
+        RequestTypeDTO out = new RequestTypeDTO(repo.save(entity));
+        return respondCreatedStatus(out, getClass(), "getRequestType", out.getId());
     }
 
     @PutMapping("/{typeid}")
     public ResponseEntity<EntityMessage<RequestTypeDTO>> updateRequestType(
             @PathVariable Long typeid,
-            @Valid @RequestBody RequestType type,
+            @Valid @RequestBody RequestTypeDTO data,
             BindingResult validationResult) {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult);
@@ -81,8 +68,12 @@ public class RequestTypeController {
         if (!repo.exists(typeid)) {
             throw new NotFoundException(typeid.toString());
         }
-        type.setId(typeid);
-        RequestTypeDTO out = new RequestTypeDTO(repo.save(type));
+
+        RequestType entity = data.toEntity();
+        entity.setId(typeid);
+        JpaUtils.fetchManager(userRepo, entity);
+
+        RequestTypeDTO out = new RequestTypeDTO(repo.save(entity));
         EntityMessage<RequestTypeDTO> msg = new EntityMessage<>("success", out);
         return ResponseEntity.accepted().body(msg);
     }

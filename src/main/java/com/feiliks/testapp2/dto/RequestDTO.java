@@ -2,16 +2,26 @@ package com.feiliks.testapp2.dto;
 
 import com.feiliks.testapp2.jpa.entities.Request;
 import java.util.Date;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 public class RequestDTO {
 
     private Long id;
+
+    @NotNull(message = "Request title must not be null.")
+    @Size(min = 1, max = 127, message = "Request title is invalid (1-127 characters).")
     private String title;
+
     private String content;
-    private Date created;
+    private Date created = new Date();
     private Date modified;
     private UserDTO owner;
+
+    @NotNull(message = "Request type must not be null.")
     private RequestTypeDTO requestType;
+
+    @NotNull(message = "Request status must not be null.")
     private Request.Status status;
 
     public RequestDTO() {
@@ -26,6 +36,19 @@ public class RequestDTO {
         owner = new UserDTO(request.getOwner());
         requestType = new RequestTypeDTO(request.getRequestType());
         status = request.getStatus();
+    }
+
+    public Request toEntity() {
+        Request e = new Request();
+        e.setId(id);
+        e.setTitle(title);
+        e.setContent(content);
+        e.setCreated(created);
+        e.setModified(modified);
+        e.setOwner(owner == null ? null : owner.toEntity());
+        e.setRequestType(requestType == null ? null : requestType.toEntity());
+        e.setStatus(status);
+        return e;
     }
 
     public Long getId() {

@@ -3,15 +3,21 @@ package com.feiliks.testapp2.dto;
 import com.feiliks.testapp2.jpa.entities.User;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
 public class UserDTO {
 
     private Long id;
+
     @NotNull(message = "Username must not be null.")
     @Pattern(regexp = "^[a-zA-Z0-9\\-_]{3,64}$", message = "Username is invalid.")
     private String username;
+
+    @Pattern(regexp = "^[ \\-+0-9]{3,16}$", message = "Phone number is invalid.")
     private String phone;
+
     @Pattern(regexp = "^.+@.+$", message = "Email is invalid.")
+    @Size(max = 128, message = "E-mail address must not be longer than 128.")
     private String email;
 
     public UserDTO() {
@@ -22,6 +28,15 @@ public class UserDTO {
         username = user.getUsername();
         phone = user.getPhone();
         email = user.getEmail();
+    }
+
+    public User toEntity() {
+        User e = new User();
+        e.setId(id);
+        e.setUsername(username);
+        e.setPhone(phone);
+        e.setEmail(email);
+        return e;
     }
 
     public Long getId() {
@@ -45,7 +60,7 @@ public class UserDTO {
     }
 
     public void setPhone(String phone) {
-        this.phone = phone;
+        this.phone = phone == null ? null : phone.trim();
     }
 
     public String getEmail() {
@@ -53,7 +68,7 @@ public class UserDTO {
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email = email == null ? null : email.trim();
     }
 
 }
