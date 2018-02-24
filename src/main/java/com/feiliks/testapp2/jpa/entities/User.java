@@ -157,9 +157,13 @@ public class User implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
         hash += (username != null ? username.hashCode() : 0);
-        return hash;
+        if (hash != 0) {
+            return hash;
+        }
+        return super.hashCode();
     }
 
     @Override
@@ -169,7 +173,9 @@ public class User implements Serializable {
         }
         User other = (User) object;
         if (this.id == null) {
-            if (this.username == null) return super.equals(object);
+            if (this.username == null) {
+                return super.equals(object);
+            }
             return this.username.equals(other.username);
         }
         return this.id.equals(other.id);

@@ -7,9 +7,11 @@ import com.feiliks.testapp2.NotFoundException;
 import com.feiliks.testapp2.ValidationException;
 import com.feiliks.testapp2.dto.EntityMessage;
 import com.feiliks.testapp2.dto.RequirementDTO;
+import com.feiliks.testapp2.jpa.entities.CheckPoint;
 import com.feiliks.testapp2.jpa.entities.Request;
 import com.feiliks.testapp2.jpa.entities.RequestType;
 import com.feiliks.testapp2.jpa.entities.Requirement;
+import com.feiliks.testapp2.jpa.entities.Tag;
 import com.feiliks.testapp2.jpa.entities.User;
 import com.feiliks.testapp2.jpa.repositories.CheckPointRepository;
 import com.feiliks.testapp2.jpa.repositories.RequestRepository;
@@ -17,6 +19,7 @@ import com.feiliks.testapp2.jpa.repositories.RequirementRepository;
 import com.feiliks.testapp2.jpa.repositories.TagRepository;
 import com.feiliks.testapp2.jpa.repositories.UserRepository;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -56,11 +59,8 @@ public class RequirementController extends AbstractController {
     private TagRepository tagRepo;
 
     private User checkAuthorization(HttpServletRequest req, Requirement data) {
-        User owner = AuthTokenUtil.getUser(req);
-        if (owner == null) {
-            throw new AuthorizationException();
-        }
-        Set<Request> requests = data.getRequests();
+        User owner = AuthTokenUtil.getUser(req); // assume protected by TokenAuthInterceptor/Filter
+        Set<Request> requests = data.getRequests(); // assume requests been fetched
         for (Request request : requests) {
             RequestType rtype = request.getRequestType();
             User manager = rtype.getManager();
@@ -74,9 +74,6 @@ public class RequirementController extends AbstractController {
     @GetMapping
     public List<RequirementDTO> getOwnRequirements(HttpServletRequest req) {
         User owner = AuthTokenUtil.getUser(req);
-        if (owner == null) {
-            throw new AuthorizationException();
-        }
         List<RequirementDTO> out = new ArrayList<>();
         for (Requirement r : owner.getRequirementsOwned()) {
             out.add(new RequirementDTO(r));
@@ -100,6 +97,7 @@ public class RequirementController extends AbstractController {
         JpaUtils.fetchRequirementParticipants(userRepo, entity);
         JpaUtils.fetchOrCreateRequirementTags(tagRepo, entity);
         entity.setCreated(new Date());
+        entity.setModified(entity.getCreated());
 
         RequirementDTO out = new RequirementDTO(repo.save(entity));
         return respondCreatedStatus(out, getClass(), "getRequirement", out.getId());
@@ -114,7 +112,8 @@ public class RequirementController extends AbstractController {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult);
         }
-        if (!repo.exists(requirementid)) {
+        Requirement original = repo.findOne(requirementid);
+        if (original == null) {
             throw new NotFoundException(requirementid.toString());
         }
 
@@ -124,6 +123,7 @@ public class RequirementController extends AbstractController {
         entity.setOwner(checkAuthorization(req, entity));
         JpaUtils.fetchRequirementParticipants(userRepo, entity);
         JpaUtils.fetchOrCreateRequirementTags(tagRepo, entity);
+        entity.setCreated(original.getCreated());
         entity.setModified(new Date());
 
         RequirementDTO out = new RequirementDTO(repo.save(entity));
@@ -133,24 +133,121 @@ public class RequirementController extends AbstractController {
 
     @GetMapping("/{requirementid}")
     public RequirementDTO getRequirement(@PathVariable Long requirementid) {
-        Requirement r = repo.findOne(requirementid);
-        if (r == null) {
+        Requirement entity = repo.findOne(requirementid);
+        if (entity == null) {
             throw new NotFoundException(requirementid.toString());
         }
-        return new RequirementDTO(r);
+        return new RequirementDTO(entity);
     }
 
     @DeleteMapping("/{requirementid}")
     public ResponseEntity<?> deleteRequirement(
             HttpServletRequest req,
             @PathVariable Long requirementid) {
-        Requirement r = repo.findOne(requirementid);
-        if (r == null) {
+        Requirement entity = repo.findOne(requirementid);
+        if (entity == null) {
             throw new NotFoundException(requirementid.toString());
         }
-        checkAuthorization(req, r);
-        repo.delete(r);
+        checkAuthorization(req, entity);
+        repo.delete(entity);
         return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{requirementid}/requests/{requestid}")
+    public ResponseEntity<EntityMessage<RequirementDTO>> deleteRequest(
+            HttpServletRequest req,
+            @PathVariable Long requirementid,
+            @PathVariable Long requestid) {
+        Requirement entity = repo.findOne(requirementid);
+        if (entity == null) {
+            throw new NotFoundException(requirementid.toString());
+        }
+        checkAuthorization(req, entity);
+
+        Set<Request> requests = entity.getRequests();
+        Request d = new Request();
+        d.setId(requestid);
+        requests.remove(d);
+
+        RequirementDTO out = new RequirementDTO(repo.save(entity));
+        EntityMessage<RequirementDTO> msg = new EntityMessage<>("success", out);
+        return ResponseEntity.accepted().body(msg);
+    }
+
+    @DeleteMapping("/{requirementid}/checkpoints/{checkpointid}")
+    public ResponseEntity<EntityMessage<RequirementDTO>> deleteCheckPoint(
+            HttpServletRequest req,
+            @PathVariable Long requirementid,
+            @PathVariable Long checkpointid) {
+        Requirement entity = repo.findOne(requirementid);
+        if (entity == null) {
+            throw new NotFoundException(requirementid.toString());
+        }
+        checkAuthorization(req, entity);
+
+        CheckPoint found = null;
+        for (CheckPoint cp : entity.getCheckPoints()) {
+            if (Objects.equals(cp.getId(), checkpointid)) {
+                found = cp;
+            }
+        }
+        if (found == null) {
+            throw new NotFoundException(checkpointid.toString());
+        }
+        entity.getCheckPoints().remove(found);
+        checkpointRepo.delete(checkpointid); // TODO
+
+        RequirementDTO out = new RequirementDTO(entity);
+        EntityMessage<RequirementDTO> msg = new EntityMessage<>("success", out);
+        return ResponseEntity.accepted().body(msg);
+    }
+
+    @DeleteMapping("/{requirementid}/participants/{userid}")
+    public ResponseEntity<EntityMessage<RequirementDTO>> deleteParticipant(
+            HttpServletRequest req,
+            @PathVariable Long requirementid,
+            @PathVariable Long userid) {
+        Requirement entity = repo.findOne(requirementid);
+        if (entity == null) {
+            throw new NotFoundException(requirementid.toString());
+        }
+        checkAuthorization(req, entity);
+
+        Collection<User> participants = entity.getParticipants();
+        User d = new User();
+        d.setId(userid);
+        participants.remove(d);
+
+        RequirementDTO out = new RequirementDTO(repo.save(entity));
+        EntityMessage<RequirementDTO> msg = new EntityMessage<>("success", out);
+        return ResponseEntity.accepted().body(msg);
+    }
+
+    @DeleteMapping("/{requirementid}/tags/{tagid}")
+    public ResponseEntity<EntityMessage<RequirementDTO>> deleteTag(
+            HttpServletRequest req,
+            @PathVariable Long requirementid,
+            @PathVariable Long tagid) {
+        Requirement entity = repo.findOne(requirementid);
+        if (entity == null) {
+            throw new NotFoundException(requirementid.toString());
+        }
+        checkAuthorization(req, entity);
+
+        Tag found = null;
+        for (Tag t : entity.getTags()) {
+            if (Objects.equals(t.getId(), tagid)) {
+                found = t;
+            }
+        }
+        if (found == null) {
+            throw new NotFoundException(tagid.toString());
+        }
+        entity.getTags().remove(found); // TODO
+
+        RequirementDTO out = new RequirementDTO(repo.save(entity));
+        EntityMessage<RequirementDTO> msg = new EntityMessage<>("success", out);
+        return ResponseEntity.accepted().body(msg);
     }
 
 }

@@ -95,7 +95,9 @@ public class RequirementDTO {
         e.setCheckPoints(cps);
         Collection<Tag> ts = new ArrayList<>();
         for (String t : getTags()) {
-            ts.add(new Tag(t));
+            if (t != null && !t.isEmpty()) {
+                ts.add(new Tag(t));
+            }
         }
         e.setTags(ts);
         Set<User> us = new HashSet<>();

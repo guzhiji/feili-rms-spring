@@ -115,9 +115,12 @@ public class CheckPoint implements Serializable {
 
     @Override
     public int hashCode() {
-        int hash = super.hashCode();
+        int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
-        return hash;
+        if (hash != 0) {
+            return hash;
+        }
+        return super.hashCode();
     }
 
     @Override
@@ -125,7 +128,9 @@ public class CheckPoint implements Serializable {
         if (!(object instanceof CheckPoint)) {
             return false;
         }
-        if (this.id == null) return super.equals(object);
+        if (this.id == null) {
+            return super.equals(object);
+        }
         CheckPoint other = (CheckPoint) object;
         return this.id.equals(other.id);
     }

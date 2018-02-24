@@ -73,21 +73,27 @@ public class Tag implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
         hash += (name != null ? name.hashCode() : 0);
-        return hash;
+        if (hash != 0) {
+            return hash;
+        }
+        return super.hashCode();
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Tag)) {
             return false;
         }
         Tag other = (Tag) object;
-        if ((this.name == null && other.name != null) || (this.name != null && !this.name.equals(other.name))) {
-            return false;
+        if (this.id == null) {
+            if (this.name == null) {
+                return super.equals(object);
+            }
+            return this.name.equals(other.name);
         }
-        return true;
+        return this.id.equals(other.id);
     }
 
     @Override

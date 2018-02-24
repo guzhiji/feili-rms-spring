@@ -73,21 +73,23 @@ public class RequestType implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (getId() != null ? getId().hashCode() : 0);
-        return hash;
+        hash += (this.id != null ? this.id.hashCode() : 0);
+        if (hash != 0) {
+            return hash;
+        }
+        return super.hashCode();
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof RequestType)) {
             return false;
         }
-        RequestType other = (RequestType) object;
-        if ((this.getId() == null && other.getId() != null) || (this.getId() != null && !this.id.equals(other.id))) {
-            return false;
+        if (this.id == null) {
+            return super.equals(object);
         }
-        return true;
+        RequestType other = (RequestType) object;
+        return this.id.equals(other.id);
     }
 
     @Override

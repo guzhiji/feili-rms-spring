@@ -163,20 +163,22 @@ public class Request implements Serializable {
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
-        return hash;
+        if (hash != 0) {
+            return hash;
+        }
+        return super.hashCode();
     }
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are not set
         if (!(object instanceof Request)) {
             return false;
         }
-        Request other = (Request) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-            return false;
+        if (this.id == null) {
+            return super.equals(object);
         }
-        return true;
+        Request other = (Request) object;
+        return this.id.equals(other.id);
     }
 
     @Override
