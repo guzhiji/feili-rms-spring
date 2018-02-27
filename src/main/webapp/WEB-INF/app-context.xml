@@ -4,8 +4,9 @@
        xmlns:mvc="http://www.springframework.org/schema/mvc"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:task="http://www.springframework.org/schema/task"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
     <!--
             <mvc:annotation-driven>
@@ -36,6 +37,7 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 </mvc:annotation-driven>
     -->
 
+    <task:annotation-driven />
     <context:component-scan base-package="com.feiliks.testapp2"  />
     <!--<mvc:annotation-driven enable-matrix-variables="true" />-->
     <!-- <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping" /> -->
@@ -86,6 +88,8 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
         <property name="sshPublicKey" value="/home/guzhiji/Projects/keys/id_rsa.pub"/>
     </bean>
 
+    <!-- <bean id="backgroundTasks" class="com.feiliks.testapp2.BackgroundTasks" /> -->
+
     <jpa:repositories base-package="com.feiliks.testapp2.jpa.repositories" />
 
     <mvc:interceptors>
@@ -97,4 +101,5 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
         </mvc:interceptor>
     </mvc:interceptors>
     <mvc:annotation-driven />
+
 </beans>

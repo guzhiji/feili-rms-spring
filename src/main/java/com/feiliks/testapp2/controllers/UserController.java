@@ -71,7 +71,7 @@ class UserController extends AbstractController {
         }
         User entity = userRepository.findOne(userid);
         if (entity == null) {
-            throw new NotFoundException(userid.toString());
+            throw new NotFoundException(User.class, userid.toString());
         }
         entity.setPhone(data.getPhone());
         entity.setEmail(data.getEmail());
@@ -90,7 +90,7 @@ class UserController extends AbstractController {
         }
         User entity = userRepository.findOne(userid);
         if (entity == null) {
-            throw new NotFoundException(userid.toString());
+            throw new NotFoundException(User.class, userid.toString());
         }
         String hashed = DigestUtils.sha256Hex(data.getOriginal());
         if (hashed.equals(entity.getPassword())) {
@@ -110,7 +110,7 @@ class UserController extends AbstractController {
             @PathVariable Long userid) {
         User owner = userRepository.findOne(userid);
         if (owner == null) {
-            throw new NotFoundException(userid.toString());
+            throw new NotFoundException(User.class, userid.toString());
         }
         // WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(
         //         req.getServletContext());
@@ -127,7 +127,7 @@ class UserController extends AbstractController {
     public UserDTO getUser(@PathVariable Long userid) {
         User u = userRepository.findOne(userid);
         if (u == null) {
-            throw new NotFoundException(userid.toString());
+            throw new NotFoundException(User.class, userid.toString());
         }
         return new UserDTO(u);
     }
@@ -136,7 +136,7 @@ class UserController extends AbstractController {
     public ResponseEntity<?> deleteUser(@PathVariable Long userid) {
         User u = userRepository.findOne(userid);
         if (u == null) {
-            throw new NotFoundException(userid.toString());
+            throw new NotFoundException(User.class, userid.toString());
         }
         userRepository.delete(u);
         return ResponseEntity.noContent().build();

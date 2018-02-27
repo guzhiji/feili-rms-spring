@@ -2,26 +2,44 @@ package com.feiliks.testapp2.dto;
 
 import com.feiliks.testapp2.jpa.entities.CheckPoint;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.AssertTrue;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class CheckPointStatusDTO {
 
     @NotNull(message = "Check point status must not be null.")
-    private CheckPoint.Status status;
+    private String status;
 
     @NotNull(message = "Check point days left must not be null.")
     private Integer daysLeft;
 
+    @AssertTrue(message = "Check point status is invalid.")
+    @JsonIgnore
+    public boolean isStatusValid() {
+        try {
+            getStatusAsObject();
+            return true;
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
+
+    @JsonIgnore
+    public CheckPoint.Status getStatusAsObject() {
+        return CheckPoint.Status.valueOf(status);
+    }
+
     /**
      * @return the status
      */
-    public CheckPoint.Status getStatus() {
+    public String getStatus() {
         return status;
     }
 
     /**
      * @param status the status to set
      */
-    public void setStatus(CheckPoint.Status status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 

@@ -103,7 +103,7 @@ public class RequestController extends AbstractController {
         // 2.exists
         Request entity = repo.findOne(requestid);
         if (entity == null) {
-            throw new NotFoundException(requestid.toString());
+            throw new NotFoundException(Request.class, requestid.toString());
         }
         // 3.is owner
         User owner = AuthTokenUtil.getUser(req);
@@ -132,7 +132,7 @@ public class RequestController extends AbstractController {
         // 2.exists
         Request original = repo.findOne(requestid);
         if (original == null) {
-            throw new NotFoundException(requestid.toString());
+            throw new NotFoundException(Request.class, requestid.toString());
         }
         // 3.is owner
         User owner = AuthTokenUtil.getUser(req);
@@ -156,7 +156,7 @@ public class RequestController extends AbstractController {
     public RequestDTO getRequest(@PathVariable Long requestid) {
         Request r = repo.findOne(requestid);
         if (r == null) {
-            throw new NotFoundException(requestid.toString());
+            throw new NotFoundException(Request.class, requestid.toString());
         }
         return new RequestDTO(r);
     }
@@ -167,7 +167,7 @@ public class RequestController extends AbstractController {
             @PathVariable Long requestid) {
         Request r = repo.findOne(requestid);
         if (r == null) {
-            throw new NotFoundException(requestid.toString());
+            throw new NotFoundException(Request.class, requestid.toString());
         }
         User owner = AuthTokenUtil.getUser(req);
         if (!owner.equals(r.getOwner())) {
@@ -183,7 +183,7 @@ public class RequestController extends AbstractController {
             @PathVariable Long requestid) {
         Request request = repo.findOne(requestid);
         if (request == null) {
-            throw new NotFoundException(requestid.toString());
+            throw new NotFoundException(Request.class, requestid.toString());
         }
         Set<Requirement> requirements = request.getRequirements();
         List<RequirementDTO> out = new ArrayList<>();
@@ -206,7 +206,7 @@ public class RequestController extends AbstractController {
         // 2. parent request exists
         Request request = repo.findOne(requestid);
         if (request == null) {
-            throw new NotFoundException(requestid.toString());
+            throw new NotFoundException(Request.class, requestid.toString());
         }
         // 3. is manager
         User owner = AuthTokenUtil.getUser(req);

@@ -3,6 +3,7 @@ package com.feiliks.testapp2.dto;
 import com.feiliks.testapp2.jpa.entities.Request;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.AssertTrue;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class RequestStatusDTO {
 
@@ -10,6 +11,7 @@ public class RequestStatusDTO {
     private String status;
 
     @AssertTrue(message = "Request status is invalid.")
+    @JsonIgnore
     public boolean isStatusValid() {
         try {
             getStatusAsObject();
@@ -19,6 +21,7 @@ public class RequestStatusDTO {
         }
     }
 
+    @JsonIgnore
     public Request.Status getStatusAsObject() {
         return Request.Status.valueOf(status);
     }

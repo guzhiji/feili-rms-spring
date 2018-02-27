@@ -16,8 +16,7 @@ abstract class AbstractController {
 
     @ExceptionHandler(NotFoundException.class)
     protected ResponseEntity<Message> handleNotFound(NotFoundException ex) {
-        String entityType = getClass().getSimpleName().replace("Controller", "");
-        Message msg = new Message("failure", entityType + " not found:" + ex.getMessage());
+        Message msg = new Message("failure", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(msg);
     }
 

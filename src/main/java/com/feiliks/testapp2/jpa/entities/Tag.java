@@ -1,15 +1,20 @@
 package com.feiliks.testapp2.jpa.entities;
 
 import java.io.Serializable;
+import java.util.Collection;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.NamedQuery;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "rms_tag")
+@NamedQuery(name = "Tag.findOrphaned", query = "select t from Tag t where size(t.requirements) = 0")
 public class Tag implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -20,6 +25,10 @@ public class Tag implements Serializable {
     private String name;
     @Column(length = 16)
     private String color;
+
+    @ManyToMany(mappedBy = "tags")
+    @JsonIgnore
+    private Collection<Requirement> requirements;
 
     public Tag() {
     }
@@ -70,11 +79,27 @@ public class Tag implements Serializable {
         this.color = color;
     }
 
+    /**
+     * @return the requirements
+     */
+    public Collection<Requirement> getRequirements() {
+        return requirements;
+    }
+
+    /**
+     * @param requirements the requirements to set
+     */
+    public void setRequirements(Collection<Requirement> requirements) {
+        this.requirements = requirements;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
-        hash += (name != null ? name.hashCode() : 0);
+        if (hash == 0) {
+            hash += (name != null ? name.hashCode() : 0);
+        }
         if (hash != 0) {
             return hash;
         }

@@ -18,6 +18,8 @@ public class CheckPointDTO {
     private int daysLeft;
 
     public CheckPointDTO() {
+        status = CheckPoint.Status.PENDING;
+        daysLeft = 0;
     }
 
     public CheckPointDTO(CheckPoint checkPoint) {

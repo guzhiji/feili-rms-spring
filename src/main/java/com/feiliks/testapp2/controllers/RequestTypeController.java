@@ -66,7 +66,7 @@ public class RequestTypeController extends AbstractController {
             throw new ValidationException(validationResult);
         }
         if (!repo.exists(typeid)) {
-            throw new NotFoundException(typeid.toString());
+            throw new NotFoundException(RequestType.class, typeid.toString());
         }
 
         RequestType entity = data.toEntity();
@@ -82,7 +82,7 @@ public class RequestTypeController extends AbstractController {
     public RequestTypeDTO getRequestType(@PathVariable Long typeid) {
         RequestType rt = repo.findOne(typeid);
         if (rt == null) {
-            throw new NotFoundException(typeid.toString());
+            throw new NotFoundException(RequestType.class, typeid.toString());
         }
         return new RequestTypeDTO(rt);
     }
@@ -91,7 +91,7 @@ public class RequestTypeController extends AbstractController {
     public ResponseEntity<?> deleteRequestType(@PathVariable Long typeid) {
         RequestType entity = repo.findOne(typeid);
         if (entity == null) {
-            throw new NotFoundException(typeid.toString());
+            throw new NotFoundException(RequestType.class, typeid.toString());
         }
         repo.delete(entity);
         return ResponseEntity.noContent().build();

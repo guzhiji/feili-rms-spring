@@ -25,6 +25,10 @@ public class RequestDTO {
     private Request.Status status;
 
     public RequestDTO() {
+        status = Request.Status.OPEN;
+        Date n = new Date();
+        created = n;
+        modified = n;
     }
 
     public RequestDTO(Request request) {
