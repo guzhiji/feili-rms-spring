@@ -54,6 +54,10 @@ public class User implements Serializable {
     @JsonIgnore
     private Set<Request> requestsOwned;
 
+    @OneToMany(mappedBy = "manager")
+    @JsonIgnore
+    private Set<RequestType> requestTypesManaged;
+
     /**
      * @return the id
      */
@@ -153,6 +157,20 @@ public class User implements Serializable {
      */
     public void setRequestsOwned(Set<Request> requestsOwned) {
         this.requestsOwned = requestsOwned;
+    }
+
+    /**
+     * @return the requestTypesManaged
+     */
+    public Set<RequestType> getRequestTypesManaged() {
+        return requestTypesManaged;
+    }
+
+    /**
+     * @param requestTypesManaged the requestTypesManaged to set
+     */
+    public void setRequestTypesManaged(Set<RequestType> requestTypesManaged) {
+        this.requestTypesManaged = requestTypesManaged;
     }
 
     @Override

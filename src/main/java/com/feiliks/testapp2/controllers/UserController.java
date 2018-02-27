@@ -9,7 +9,11 @@ import com.feiliks.testapp2.jpa.entities.User;
 import com.feiliks.testapp2.dto.UserDTO;
 import com.feiliks.testapp2.dto.PasswordDTO;
 import com.feiliks.testapp2.dto.RequestDTO;
+import com.feiliks.testapp2.dto.RequestTypeDTO;
+import com.feiliks.testapp2.dto.RequirementDTO;
 import com.feiliks.testapp2.jpa.entities.Request;
+import com.feiliks.testapp2.jpa.entities.RequestType;
+import com.feiliks.testapp2.jpa.entities.Requirement;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,8 +24,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-//import org.springframework.transaction.annotation.Transactional;
-//import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.transaction.annotation.Transactional;
 import com.feiliks.testapp2.jpa.repositories.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +48,16 @@ class UserController extends AbstractController {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(msg);
     }
 
+    private User getUserOrRaiseEx(Long userid) {
+        User entity = userRepository.findOne(userid);
+        if (entity == null) {
+            throw new NotFoundException(User.class, userid.toString());
+        }
+        return entity;
+    }
+
     @PostMapping
+    @Transactional
     public ResponseEntity<EntityMessage<UserDTO>> createUser(
             @RequestBody @Valid User data,
             BindingResult bindingResult) {
@@ -62,6 +74,7 @@ class UserController extends AbstractController {
     }
 
     @PutMapping("/{userid}")
+    @Transactional
     public ResponseEntity<EntityMessage<UserDTO>> updateUser(
             @PathVariable Long userid,
             @RequestBody @Valid UserDTO data,
@@ -69,10 +82,7 @@ class UserController extends AbstractController {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
-        User entity = userRepository.findOne(userid);
-        if (entity == null) {
-            throw new NotFoundException(User.class, userid.toString());
-        }
+        User entity = getUserOrRaiseEx(userid);
         entity.setPhone(data.getPhone());
         entity.setEmail(data.getEmail());
         UserDTO out = new UserDTO(userRepository.save(entity));
@@ -81,6 +91,7 @@ class UserController extends AbstractController {
     }
 
     @PutMapping("/{userid}/password")
+    @Transactional
     public ResponseEntity<Message> updatePassword(
             @PathVariable Long userid,
             @RequestBody @Valid PasswordDTO data,
@@ -88,10 +99,7 @@ class UserController extends AbstractController {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
-        User entity = userRepository.findOne(userid);
-        if (entity == null) {
-            throw new NotFoundException(User.class, userid.toString());
-        }
+        User entity = getUserOrRaiseEx(userid);
         String hashed = DigestUtils.sha256Hex(data.getOriginal());
         if (hashed.equals(entity.getPassword())) {
             entity.setPassword(DigestUtils.sha256Hex(data.getPassword()));
@@ -105,17 +113,11 @@ class UserController extends AbstractController {
     }
 
     @GetMapping("/{userid}/requests")
-    public List<RequestDTO> getUserRequests(
+    @Transactional(readOnly = true)
+    public List<RequestDTO> getOwnedRequests(
             HttpServletRequest req,
             @PathVariable Long userid) {
-        User owner = userRepository.findOne(userid);
-        if (owner == null) {
-            throw new NotFoundException(User.class, userid.toString());
-        }
-        // WebApplicationContext ctx = WebApplicationContextUtils.getWebApplicationContext(
-        //         req.getServletContext());
-        // RequestRepository reqRepo = ctx.getBean(RequestRepository.class);
-        // List<Request> result = reqRepo.findByOwner(owner);
+        User owner = getUserOrRaiseEx(userid);
         List<RequestDTO> out = new ArrayList<>();
         for (Request r : owner.getRequestsOwned()) {
             out.add(new RequestDTO(r));
@@ -123,22 +125,55 @@ class UserController extends AbstractController {
         return out;
     }
 
-    @GetMapping("/{userid}")
-    public UserDTO getUser(@PathVariable Long userid) {
-        User u = userRepository.findOne(userid);
-        if (u == null) {
-            throw new NotFoundException(User.class, userid.toString());
+    @GetMapping("/{userid}/request-types")
+    @Transactional(readOnly = true)
+    public List<RequestTypeDTO> getManagedRequestTypes(
+            HttpServletRequest req,
+            @PathVariable Long userid) {
+        User owner = getUserOrRaiseEx(userid);
+        List<RequestTypeDTO> out = new ArrayList<>();
+        for (RequestType r : owner.getRequestTypesManaged()) {
+            out.add(new RequestTypeDTO(r));
         }
-        return new UserDTO(u);
+        return out;
+    }
+
+    @GetMapping("/{userid}/requirements/owned")
+    @Transactional(readOnly = true)
+    public List<RequirementDTO> getOwnedRequirements(
+            HttpServletRequest req,
+            @PathVariable Long userid) {
+        User owner = getUserOrRaiseEx(userid);
+        List<RequirementDTO> out = new ArrayList<>();
+        for (Requirement r : owner.getRequirementsOwned()) {
+            out.add(new RequirementDTO(r));
+        }
+        return out;
+    }
+
+    @GetMapping("/{userid}/requirements/participated")
+    @Transactional(readOnly = true)
+    public List<RequirementDTO> getParticipatedRequirements(
+            HttpServletRequest req,
+            @PathVariable Long userid) {
+        User owner = getUserOrRaiseEx(userid);
+        List<RequirementDTO> out = new ArrayList<>();
+        for (Requirement r : owner.getRequirementsParticipated()) {
+            out.add(new RequirementDTO(r));
+        }
+        return out;
+    }
+
+    @GetMapping("/{userid}")
+    @Transactional(readOnly = true)
+    public UserDTO getUser(@PathVariable Long userid) {
+        return new UserDTO(getUserOrRaiseEx(userid));
     }
 
     @DeleteMapping("/{userid}")
+    @Transactional
     public ResponseEntity<?> deleteUser(@PathVariable Long userid) {
-        User u = userRepository.findOne(userid);
-        if (u == null) {
-            throw new NotFoundException(User.class, userid.toString());
-        }
-        userRepository.delete(u);
+        userRepository.delete(getUserOrRaiseEx(userid));
         return ResponseEntity.noContent().build();
     }
 

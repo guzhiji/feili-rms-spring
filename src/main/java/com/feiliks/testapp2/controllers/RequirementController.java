@@ -22,7 +22,6 @@ import com.feiliks.testapp2.jpa.repositories.UserRepository;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -73,7 +72,16 @@ public class RequirementController extends AbstractController {
         throw new AuthorizationException();
     }
 
+    private Requirement getRequirementOrRaiseEx(Long requirementid) {
+        Requirement entity = repo.findOne(requirementid);
+        if (entity == null) {
+            throw new NotFoundException(Requirement.class, requirementid.toString());
+        }
+        return entity;
+    }
+
     @GetMapping
+    @Transactional(readOnly = true)
     public List<RequirementDTO> getOwnRequirements(HttpServletRequest req) {
         User owner = AuthTokenUtil.getUser(req);
         List<RequirementDTO> out = new ArrayList<>();
@@ -106,6 +114,7 @@ public class RequirementController extends AbstractController {
     }
 
     @PutMapping("/{requirementid}")
+    @Transactional
     public ResponseEntity<EntityMessage<RequirementDTO>> updateRequirement(
             HttpServletRequest req,
             @PathVariable Long requirementid,
@@ -114,10 +123,7 @@ public class RequirementController extends AbstractController {
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult);
         }
-        Requirement original = repo.findOne(requirementid);
-        if (original == null) {
-            throw new NotFoundException(Requirement.class, requirementid.toString());
-        }
+        Requirement original = getRequirementOrRaiseEx(requirementid);
 
         Requirement entity = data.toEntity();
         entity.setId(requirementid);
@@ -135,6 +141,11 @@ public class RequirementController extends AbstractController {
             }
         }
 
+        CheckPoint[] orderedCps = entity.getCheckPoints().toArray(new CheckPoint[0]);
+        for (int i = 0; i < orderedCps.length; ++i) {
+            orderedCps[i].setOrdinal(i);
+        }
+
         JpaUtils.fetchRequirementParticipants(userRepo, entity);
         JpaUtils.fetchOrCreateRequirementTags(tagRepo, entity);
 
@@ -148,36 +159,29 @@ public class RequirementController extends AbstractController {
     }
 
     @GetMapping("/{requirementid}")
+    @Transactional(readOnly = true)
     public RequirementDTO getRequirement(@PathVariable Long requirementid) {
-        Requirement entity = repo.findOne(requirementid);
-        if (entity == null) {
-            throw new NotFoundException(Requirement.class, requirementid.toString());
-        }
-        return new RequirementDTO(entity);
+        return new RequirementDTO(getRequirementOrRaiseEx(requirementid));
     }
 
     @DeleteMapping("/{requirementid}")
+    @Transactional
     public ResponseEntity<?> deleteRequirement(
             HttpServletRequest req,
             @PathVariable Long requirementid) {
-        Requirement entity = repo.findOne(requirementid);
-        if (entity == null) {
-            throw new NotFoundException(Requirement.class, requirementid.toString());
-        }
+        Requirement entity = getRequirementOrRaiseEx(requirementid);
         getUserIfOneOfTheManagers(req, entity);
         repo.delete(entity);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{requirementid}/requests/{requestid}")
+    @Transactional
     public ResponseEntity<EntityMessage<RequirementDTO>> detachRequest(
             HttpServletRequest req,
             @PathVariable Long requirementid,
             @PathVariable Long requestid) {
-        Requirement entity = repo.findOne(requirementid);
-        if (entity == null) {
-            throw new NotFoundException(Requirement.class, requirementid.toString());
-        }
+        Requirement entity = getRequirementOrRaiseEx(requirementid);
         // manager
         User curUser = AuthTokenUtil.getUser(req);
         boolean found = false;
@@ -204,6 +208,7 @@ public class RequirementController extends AbstractController {
     }
 
     @PutMapping("/{requirementid}/checkpoints/{checkpointid}")
+    @Transactional
     public ResponseEntity<EntityMessage<CheckPointStatusDTO>> updateCheckPointStatus(
             HttpServletRequest req,
             @PathVariable Long requirementid,
@@ -235,14 +240,12 @@ public class RequirementController extends AbstractController {
     }
 
     @DeleteMapping("/{requirementid}/checkpoints/{checkpointid}")
+    @Transactional
     public ResponseEntity<EntityMessage<RequirementDTO>> deleteCheckPoint(
             HttpServletRequest req,
             @PathVariable Long requirementid,
             @PathVariable Long checkpointid) {
-        Requirement entity = repo.findOne(requirementid);
-        if (entity == null) {
-            throw new NotFoundException(Requirement.class, requirementid.toString());
-        }
+        Requirement entity = getRequirementOrRaiseEx(requirementid);
         getUserIfOneOfTheManagers(req, entity);
 
         Collection<CheckPoint> checkpoints = entity.getCheckPoints();
@@ -256,14 +259,12 @@ public class RequirementController extends AbstractController {
     }
 
     @DeleteMapping("/{requirementid}/participants/{userid}")
+    @Transactional
     public ResponseEntity<EntityMessage<RequirementDTO>> removeParticipant(
             HttpServletRequest req,
             @PathVariable Long requirementid,
             @PathVariable Long userid) {
-        Requirement entity = repo.findOne(requirementid);
-        if (entity == null) {
-            throw new NotFoundException(Requirement.class, requirementid.toString());
-        }
+        Requirement entity = getRequirementOrRaiseEx(requirementid);
         getUserIfOneOfTheManagers(req, entity);
 
         Collection<User> participants = entity.getParticipants();
@@ -277,14 +278,12 @@ public class RequirementController extends AbstractController {
     }
 
     @DeleteMapping("/{requirementid}/tags/{tag}")
+    @Transactional
     public ResponseEntity<EntityMessage<RequirementDTO>> detachTag(
             HttpServletRequest req,
             @PathVariable Long requirementid,
             @PathVariable String tag) {
-        Requirement entity = repo.findOne(requirementid);
-        if (entity == null) {
-            throw new NotFoundException(Requirement.class, requirementid.toString());
-        }
+        Requirement entity = getRequirementOrRaiseEx(requirementid);
         getUserIfOneOfTheManagers(req, entity);
 
         RequirementDTO out = null;
@@ -293,7 +292,7 @@ public class RequirementController extends AbstractController {
             if (t.getName().equals(tag)) {
                 tags.remove(t);
                 out = new RequirementDTO(repo.save(entity));
-                if (t.getRequirements().isEmpty()) {
+                if (t.getRequirements().size() <= 1) {
                     tagRepo.delete(t);
                 }
                 break;

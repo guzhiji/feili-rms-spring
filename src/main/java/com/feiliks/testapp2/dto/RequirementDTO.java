@@ -7,8 +7,10 @@ import com.feiliks.testapp2.jpa.entities.Tag;
 import com.feiliks.testapp2.jpa.entities.User;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -26,7 +28,7 @@ public class RequirementDTO {
     private Date created;
     private Date modified;
     private UserDTO owner;
-    private Set<CheckPointDTO> checkPoints;
+    private List<CheckPointDTO> checkPoints;
     private Set<UserDTO> participants;
     private Set<String> tags;
     private Set<RequestDTO> requests; // belongs to
@@ -43,9 +45,20 @@ public class RequirementDTO {
         modified = requirement.getModified();
         owner = new UserDTO(requirement.getOwner());
 
-        Set<CheckPointDTO> cps = new HashSet<>();
+        List<CheckPointDTO> cps = new ArrayList<>();
         if (requirement.getCheckPoints() != null) {
-            for (CheckPoint cp : requirement.getCheckPoints()) {
+            List<CheckPoint> sorted = new ArrayList<>(requirement.getCheckPoints());
+            sorted.sort(new Comparator<CheckPoint>() {
+                @Override
+                public int compare(CheckPoint o1, CheckPoint o2) {
+                    int c = o1.getOrdinal() - o2.getOrdinal();
+                    if (c == 0) {
+                        return o1.getDescription().compareToIgnoreCase(o2.getDescription());
+                    }
+                    return c;
+                }
+            });
+            for (CheckPoint cp : sorted) {
                 cps.add(new CheckPointDTO(cp));
             }
         }
@@ -178,14 +191,14 @@ public class RequirementDTO {
     /**
      * @return the checkPoints
      */
-    public Set<CheckPointDTO> getCheckPoints() {
-        return checkPoints == null ? new HashSet<CheckPointDTO>() : checkPoints;
+    public List<CheckPointDTO> getCheckPoints() {
+        return checkPoints == null ? new ArrayList<CheckPointDTO>() : checkPoints;
     }
 
     /**
      * @param checkPoints the checkPoints to set
      */
-    public void setCheckPoints(Set<CheckPointDTO> checkPoints) {
+    public void setCheckPoints(List<CheckPointDTO> checkPoints) {
         this.checkPoints = checkPoints;
     }
 

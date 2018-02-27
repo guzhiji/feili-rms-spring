@@ -13,6 +13,7 @@ import java.util.List;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,6 +35,7 @@ public class RequestTypeController extends AbstractController {
     private UserRepository userRepo;
 
     @GetMapping
+    @Transactional(readOnly = true)
     public List<RequestTypeDTO> getRequestTypes() {
         List<RequestTypeDTO> out = new ArrayList<>();
         for (RequestType rt : repo.findAll()) {
@@ -43,6 +45,7 @@ public class RequestTypeController extends AbstractController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<EntityMessage<RequestTypeDTO>> createRequestType(
             @Valid @RequestBody RequestTypeDTO data,
             BindingResult validationResult) {
@@ -58,6 +61,7 @@ public class RequestTypeController extends AbstractController {
     }
 
     @PutMapping("/{typeid}")
+    @Transactional
     public ResponseEntity<EntityMessage<RequestTypeDTO>> updateRequestType(
             @PathVariable Long typeid,
             @Valid @RequestBody RequestTypeDTO data,
@@ -79,6 +83,7 @@ public class RequestTypeController extends AbstractController {
     }
 
     @GetMapping("/{typeid}")
+    @Transactional(readOnly = true)
     public RequestTypeDTO getRequestType(@PathVariable Long typeid) {
         RequestType rt = repo.findOne(typeid);
         if (rt == null) {
@@ -88,6 +93,7 @@ public class RequestTypeController extends AbstractController {
     }
 
     @DeleteMapping("/{typeid}")
+    @Transactional
     public ResponseEntity<?> deleteRequestType(@PathVariable Long typeid) {
         RequestType entity = repo.findOne(typeid);
         if (entity == null) {

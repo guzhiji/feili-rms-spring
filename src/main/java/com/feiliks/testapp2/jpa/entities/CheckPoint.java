@@ -31,6 +31,9 @@ public class CheckPoint implements Serializable {
 //    @Size(min = 1, max = 255, message = "Checkpoint description is invalid (1-255 characters).")
     private String description;
 
+    @Column(nullable = false)
+    private int ordinal;
+
     @Column(nullable = false, length = 8)
     @Enumerated(EnumType.STRING)
 //    @NotNull(message = "Checkpoint status must not be null.")
@@ -69,6 +72,20 @@ public class CheckPoint implements Serializable {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * @return the ordinal
+     */
+    public int getOrdinal() {
+        return ordinal;
+    }
+
+    /**
+     * @param ordinal the ordinal to set
+     */
+    public void setOrdinal(int ordinal) {
+        this.ordinal = ordinal;
     }
 
     /**

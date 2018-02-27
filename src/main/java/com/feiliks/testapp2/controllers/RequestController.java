@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,6 +59,7 @@ public class RequestController extends AbstractController {
     private RequirementRepository requirementRepo;
 
     @GetMapping
+    @Transactional(readOnly = true)
     public List<RequestDTO> getOwnRequests(HttpServletRequest req) {
         User owner = AuthTokenUtil.getUser(req);
         if (owner == null) {
@@ -72,6 +74,7 @@ public class RequestController extends AbstractController {
     }
 
     @PostMapping
+    @Transactional
     public ResponseEntity<EntityMessage<RequestDTO>> createRequest(
             HttpServletRequest req,
             @Valid @RequestBody RequestDTO data,
@@ -91,6 +94,7 @@ public class RequestController extends AbstractController {
     }
 
     @PutMapping("/{requestid}/status")
+    @Transactional
     public ResponseEntity<EntityMessage<RequestStatusDTO>> updateRequestStatus(
             HttpServletRequest req,
             @PathVariable Long requestid,
@@ -120,6 +124,7 @@ public class RequestController extends AbstractController {
     }
 
     @PutMapping("/{requestid}")
+    @Transactional
     public ResponseEntity<EntityMessage<RequestDTO>> updateRequest(
             HttpServletRequest req,
             @PathVariable Long requestid,
@@ -153,6 +158,7 @@ public class RequestController extends AbstractController {
     }
 
     @GetMapping("/{requestid}")
+    @Transactional(readOnly = true)
     public RequestDTO getRequest(@PathVariable Long requestid) {
         Request r = repo.findOne(requestid);
         if (r == null) {
@@ -162,6 +168,7 @@ public class RequestController extends AbstractController {
     }
 
     @DeleteMapping("/{requestid}")
+    @Transactional
     public ResponseEntity<?> deleteRequest(
             HttpServletRequest req,
             @PathVariable Long requestid) {
@@ -178,6 +185,7 @@ public class RequestController extends AbstractController {
     }
 
     @GetMapping("/{requestid}/requirements")
+    @Transactional(readOnly = true)
     public List<RequirementDTO> getRequirements(
             HttpServletRequest req,
             @PathVariable Long requestid) {
@@ -194,6 +202,7 @@ public class RequestController extends AbstractController {
     }
 
     @PostMapping("/{requestid}/requirements")
+    @Transactional
     public ResponseEntity<EntityMessage<RequirementDTO>> createRequirement(
             HttpServletRequest req,
             @PathVariable Long requestid,
