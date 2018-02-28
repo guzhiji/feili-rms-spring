@@ -6,10 +6,12 @@ import com.feiliks.testapp2.ValidationException;
 import com.feiliks.testapp2.dto.EntityMessage;
 import com.feiliks.testapp2.dto.RequestTypeDTO;
 import com.feiliks.testapp2.jpa.entities.RequestType;
+import com.feiliks.testapp2.jpa.entities.User;
 import com.feiliks.testapp2.jpa.repositories.RequestTypeRepository;
 import com.feiliks.testapp2.jpa.repositories.UserRepository;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -47,8 +49,12 @@ public class RequestTypeController extends AbstractController {
     @PostMapping
     @Transactional
     public ResponseEntity<EntityMessage<RequestTypeDTO>> createRequestType(
+            HttpServletRequest req,
             @Valid @RequestBody RequestTypeDTO data,
             BindingResult validationResult) {
+
+        requiresPermissions(req, User.Permission.MANAGE_REQUEST_TYPES);
+
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult);
         }
@@ -63,9 +69,13 @@ public class RequestTypeController extends AbstractController {
     @PutMapping("/{typeid}")
     @Transactional
     public ResponseEntity<EntityMessage<RequestTypeDTO>> updateRequestType(
+            HttpServletRequest req,
             @PathVariable Long typeid,
             @Valid @RequestBody RequestTypeDTO data,
             BindingResult validationResult) {
+
+        requiresPermissions(req, User.Permission.MANAGE_REQUEST_TYPES);
+
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult);
         }
@@ -94,12 +104,18 @@ public class RequestTypeController extends AbstractController {
 
     @DeleteMapping("/{typeid}")
     @Transactional
-    public ResponseEntity<?> deleteRequestType(@PathVariable Long typeid) {
+    public ResponseEntity<?> deleteRequestType(
+            HttpServletRequest req,
+            @PathVariable Long typeid) {
+
+        requiresPermissions(req, User.Permission.MANAGE_REQUEST_TYPES);
+
         RequestType entity = repo.findOne(typeid);
         if (entity == null) {
             throw new NotFoundException(RequestType.class, typeid.toString());
         }
         repo.delete(entity);
+
         return ResponseEntity.noContent().build();
     }
 

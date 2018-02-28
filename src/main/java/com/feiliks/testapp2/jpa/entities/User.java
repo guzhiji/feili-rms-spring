@@ -2,6 +2,11 @@ package com.feiliks.testapp2.jpa.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -18,6 +23,10 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "rms_user")
 public class User implements Serializable {
+
+    public enum Permission {
+        ALL, MANAGE_REQUEST_TYPES, MANAGE_USERS
+    }
 
     private static final long serialVersionUID = 1L;
 
@@ -41,6 +50,8 @@ public class User implements Serializable {
     @Pattern(regexp = "^.+@.+$", message = "Email is invalid.")
     @Size(max = 128, message = "E-mail address must not be longer than 128.")
     private String email;
+
+    private String permissions;
 
     @ManyToMany(mappedBy = "participants")
     @JsonIgnore
@@ -171,6 +182,63 @@ public class User implements Serializable {
      */
     public void setRequestTypesManaged(Set<RequestType> requestTypesManaged) {
         this.requestTypesManaged = requestTypesManaged;
+    }
+
+    /**
+     * @return the permissions
+     */
+    public String getPermissions() {
+        return permissions;
+    }
+
+    @JsonIgnore
+    public Set<Permission> getPermissionsAsSet() {
+        Set<Permission> out = new HashSet<>();
+        if (permissions != null) {
+            for (String p : permissions.split(",")) {
+                p = p.trim();
+                if (!p.isEmpty()) {
+                    try {
+                        out.add(Permission.valueOf(p));
+                    } catch (IllegalArgumentException ex) {
+                    }
+                }
+            }
+        }
+        return out;
+    }
+
+    @JsonIgnore
+    public boolean hasPermissions(Permission... perms) {
+        Set<Permission> owned = getPermissionsAsSet();
+        if (owned.contains(Permission.ALL)) {
+            return true;
+        }
+        List<Permission> required = new ArrayList<>(Arrays.asList(perms));
+        required.remove(Permission.ALL);
+        return owned.containsAll(required);
+    }
+
+    /**
+     * @param permissions the permissions to set
+     */
+    public void setPermissions(String permissions) {
+        this.permissions = permissions;
+    }
+
+    public void setPermissions(Set<Permission> permissions) {
+        StringBuilder sb = new StringBuilder();
+        for (Permission p : permissions) {
+            if (sb.length() > 0) {
+                sb.append(',');
+            }
+            sb.append(p.name());
+        }
+        setPermissions(sb.toString());
+    }
+
+    public void setPermissions(Collection<Permission> permissions) {
+        setPermissions(new HashSet<>(permissions));
     }
 
     @Override

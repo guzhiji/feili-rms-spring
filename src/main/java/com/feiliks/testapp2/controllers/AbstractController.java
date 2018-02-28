@@ -1,11 +1,14 @@
 package com.feiliks.testapp2.controllers;
 
+import com.feiliks.testapp2.AuthTokenUtil;
 import com.feiliks.testapp2.AuthorizationException;
 import com.feiliks.testapp2.NotFoundException;
 import com.feiliks.testapp2.ValidationException;
 import com.feiliks.testapp2.dto.EntityMessage;
 import com.feiliks.testapp2.dto.Message;
+import com.feiliks.testapp2.jpa.entities.User;
 import java.net.URI;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,4 +44,10 @@ abstract class AbstractController {
         return ResponseEntity.created(uri).body(msg);
     }
 
+    protected void requiresPermissions(HttpServletRequest req, User.Permission... perms) {
+        User curUser = AuthTokenUtil.getUser(req);
+        if (!curUser.hasPermissions(perms)) {
+            throw new AuthorizationException();
+        }
+    }
 }
