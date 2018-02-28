@@ -51,6 +51,7 @@ public class User implements Serializable {
     @Size(max = 128, message = "E-mail address must not be longer than 128.")
     private String email;
 
+    @JsonIgnore
     private String permissions;
 
     @ManyToMany(mappedBy = "participants")
@@ -226,6 +227,7 @@ public class User implements Serializable {
         this.permissions = permissions;
     }
 
+    @JsonIgnore
     public void setPermissions(Set<Permission> permissions) {
         StringBuilder sb = new StringBuilder();
         for (Permission p : permissions) {
@@ -237,6 +239,7 @@ public class User implements Serializable {
         setPermissions(sb.toString());
     }
 
+    @JsonIgnore
     public void setPermissions(Collection<Permission> permissions) {
         setPermissions(new HashSet<>(permissions));
     }

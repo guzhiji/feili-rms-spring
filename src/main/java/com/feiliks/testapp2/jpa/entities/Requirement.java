@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -50,15 +51,18 @@ public class Requirement implements Serializable {
     private User owner;
 
     @ManyToMany
+    @JoinColumn(table = "rms_requirement_requests")
     private Set<Request> requests;
 
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "requirement", orphanRemoval = true)
     private Collection<CheckPoint> checkPoints;
 
     @ManyToMany
+    @JoinColumn(table = "rms_requirement_participants")
     private Collection<User> participants;
 
     @ManyToMany
+    @JoinColumn(table = "rms_requirement_tags")
     private Collection<Tag> tags;
 
     public Long getId() {

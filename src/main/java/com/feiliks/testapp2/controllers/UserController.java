@@ -8,9 +8,11 @@ import com.feiliks.testapp2.dto.Message;
 import com.feiliks.testapp2.jpa.entities.User;
 import com.feiliks.testapp2.dto.UserDTO;
 import com.feiliks.testapp2.dto.PasswordDTO;
+import com.feiliks.testapp2.dto.PermissionsDTO;
 import com.feiliks.testapp2.dto.RequestDTO;
 import com.feiliks.testapp2.dto.RequestTypeDTO;
 import com.feiliks.testapp2.dto.RequirementDTO;
+import com.feiliks.testapp2.dto.UserWithPermissionsDTO;
 import com.feiliks.testapp2.jpa.entities.Request;
 import com.feiliks.testapp2.jpa.entities.RequestType;
 import com.feiliks.testapp2.jpa.entities.Requirement;
@@ -112,6 +114,22 @@ class UserController extends AbstractController {
         }
     }
 
+    @PutMapping("/{userid}/permissions")
+    @Transactional
+    public ResponseEntity<Message> updatePermissions(
+            @PathVariable Long userid,
+            @RequestBody @Valid PermissionsDTO data,
+            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
+        User entity = getUserOrRaiseEx(userid);
+        entity.setPermissions(data.getPermissionsAsSet());
+        userRepository.save(entity);
+        Message msg = new Message("success", "Permissions are updated.");
+        return ResponseEntity.accepted().body(msg);
+    }
+
     @GetMapping("/{userid}/requests")
     @Transactional(readOnly = true)
     public List<RequestDTO> getOwnedRequests(
@@ -166,8 +184,8 @@ class UserController extends AbstractController {
 
     @GetMapping("/{userid}")
     @Transactional(readOnly = true)
-    public UserDTO getUser(@PathVariable Long userid) {
-        return new UserDTO(getUserOrRaiseEx(userid));
+    public UserWithPermissionsDTO getUser(@PathVariable Long userid) {
+        return new UserWithPermissionsDTO(getUserOrRaiseEx(userid));
     }
 
     @DeleteMapping("/{userid}")
