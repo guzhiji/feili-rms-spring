@@ -4,4 +4,6 @@ package.sh
 *~
 .*.bak
 .*~
-
+.idea
+.vscode
+*.iml
