@@ -11,6 +11,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -55,12 +56,11 @@ public class Request implements Serializable {
     private Set<Requirement> requirements;
 
     @ManyToOne(optional = false)
-//    @NotNull(message = "Request type must not be null.")
+    @JoinColumn(name = "request_type_id")
     private RequestType requestType;
 
     @Column(nullable = false, length = 8)
     @Enumerated(EnumType.STRING)
-//    @NotNull(message = "Request status must not be null.")
     private Status status;
 
     public Long getId() {
