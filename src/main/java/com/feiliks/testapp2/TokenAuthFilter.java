@@ -139,15 +139,14 @@ public class TokenAuthFilter implements Filter {
                         keyPairProvider.getSigner()).getEncoded());
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                chain.doFilter(request, response);
             } catch (Exception ex) {
                 SecurityContextHolder.clearContext();
                 ((HttpServletResponse) response).sendError(
                         HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
+                return;
             }
-        } else {
-            chain.doFilter(request, response);
         }
+        chain.doFilter(request, response);
 
     }
 

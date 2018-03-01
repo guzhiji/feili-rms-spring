@@ -2,40 +2,25 @@ package com.feiliks.testapp2.controllers;
 
 import com.feiliks.testapp2.AlreadyExistsException;
 import com.feiliks.testapp2.NotFoundException;
+import com.feiliks.testapp2.PasswordUtil;
 import com.feiliks.testapp2.ValidationException;
-import com.feiliks.testapp2.dto.EntityMessage;
-import com.feiliks.testapp2.dto.Message;
-import com.feiliks.testapp2.jpa.entities.User;
-import com.feiliks.testapp2.dto.UserDTO;
-import com.feiliks.testapp2.dto.PasswordDTO;
-import com.feiliks.testapp2.dto.PermissionsDTO;
-import com.feiliks.testapp2.dto.RequestDTO;
-import com.feiliks.testapp2.dto.RequestTypeDTO;
-import com.feiliks.testapp2.dto.RequirementDTO;
-import com.feiliks.testapp2.dto.UserWithPermissionsDTO;
+import com.feiliks.testapp2.dto.*;
 import com.feiliks.testapp2.jpa.entities.Request;
 import com.feiliks.testapp2.jpa.entities.RequestType;
 import com.feiliks.testapp2.jpa.entities.Requirement;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import com.feiliks.testapp2.jpa.entities.User;
+import com.feiliks.testapp2.jpa.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import com.feiliks.testapp2.jpa.repositories.UserRepository;
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.validation.BindingResult;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -69,7 +54,7 @@ class UserController extends AbstractController {
         if (userRepository.existsByUsername(data.getUsername())) {
             throw new AlreadyExistsException(data.getUsername());
         }
-        data.setPassword(DigestUtils.sha256Hex(data.getPassword()));
+        data.setPassword(PasswordUtil.hash(data.getUsername(), data.getPassword()));
 
         UserDTO out = new UserDTO(userRepository.save(data));
         return respondCreatedStatus(out, getClass(), "getUser", out.getId());
@@ -85,6 +70,7 @@ class UserController extends AbstractController {
             throw new ValidationException(bindingResult);
         }
         User entity = getUserOrRaiseEx(userid);
+        // username is not allowed to be changed
         entity.setPhone(data.getPhone());
         entity.setEmail(data.getEmail());
         UserDTO out = new UserDTO(userRepository.save(entity));
@@ -102,9 +88,9 @@ class UserController extends AbstractController {
             throw new ValidationException(bindingResult);
         }
         User entity = getUserOrRaiseEx(userid);
-        String hashed = DigestUtils.sha256Hex(data.getOriginal());
+        String hashed = PasswordUtil.hash(entity.getUsername(), data.getOriginal());
         if (hashed.equals(entity.getPassword())) {
-            entity.setPassword(DigestUtils.sha256Hex(data.getPassword()));
+            entity.setPassword(PasswordUtil.hash(entity.getUsername(), data.getPassword()));
             userRepository.save(entity);
             Message msg = new Message("success", "Password is updated.");
             return ResponseEntity.accepted().body(msg);
@@ -190,7 +176,8 @@ class UserController extends AbstractController {
 
     @DeleteMapping("/{userid}")
     @Transactional
-    public ResponseEntity<?> deleteUser(@PathVariable Long userid) {
+    public ResponseEntity<?> deleteUser(HttpServletRequest req, @PathVariable Long userid) {
+        requiresPermissions(req, User.Permission.MANAGE_USERS);
         userRepository.delete(getUserOrRaiseEx(userid));
         return ResponseEntity.noContent().build();
     }
