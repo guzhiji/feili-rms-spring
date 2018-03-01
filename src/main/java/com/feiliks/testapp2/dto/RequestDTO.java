@@ -38,7 +38,7 @@ public class RequestDTO {
         created = request.getCreated();
         modified = request.getModified();
         owner = new UserDTO(request.getOwner());
-        requestType = new RequestTypeDTO(request.getRequestType());
+        requestType = new RequestTypeDTO(request.getType());
         status = request.getStatus();
     }
 
@@ -50,7 +50,7 @@ public class RequestDTO {
         e.setCreated(created);
         e.setModified(modified);
         e.setOwner(owner == null ? null : owner.toEntity());
-        e.setRequestType(requestType == null ? null : requestType.toEntity());
+        e.setType(requestType == null ? null : requestType.toEntity());
         e.setStatus(status);
         return e;
     }
@@ -112,14 +112,14 @@ public class RequestDTO {
     /**
      * @return the requestType
      */
-    public RequestTypeDTO getRequestType() {
+    public RequestTypeDTO getType() {
         return requestType;
     }
 
     /**
      * @param requestType the requestType to set
      */
-    public void setRequestType(RequestTypeDTO requestType) {
+    public void setType(RequestTypeDTO requestType) {
         this.requestType = requestType;
     }
 

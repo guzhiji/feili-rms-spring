@@ -134,14 +134,14 @@ public class Request implements Serializable {
     /**
      * @return the requestType
      */
-    public RequestType getRequestType() {
+    public RequestType getType() {
         return requestType;
     }
 
     /**
      * @param requestType the requestType to set
      */
-    public void setRequestType(RequestType requestType) {
+    public void setType(RequestType requestType) {
         this.requestType = requestType;
     }
 

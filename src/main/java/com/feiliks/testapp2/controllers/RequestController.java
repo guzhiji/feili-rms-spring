@@ -147,7 +147,7 @@ public class RequestController extends AbstractController {
 
         Request entity = data.toEntity();
         entity.setId(requestid);
-        entity.setRequestType(original.getRequestType()); // cannot change type
+        entity.setType(original.getType()); // cannot change type
         entity.setOwner(owner);
         entity.setCreated(original.getCreated());
         entity.setModified(new Date());
@@ -219,7 +219,7 @@ public class RequestController extends AbstractController {
         }
         // 3. is manager
         User owner = AuthTokenUtil.getUser(req);
-        User manager = request.getRequestType().getManager();
+        User manager = request.getType().getManager();
         if (manager == null || !Objects.equals(manager.getId(), owner.getId())) {
             throw new AuthorizationException();
         }

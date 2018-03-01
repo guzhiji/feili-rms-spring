@@ -62,7 +62,7 @@ public class JpaUtils {
     }
 
     public static void fetchRequestType(RequestTypeRepository repo, Request data) {
-        RequestType type = data.getRequestType(), fetchedType = null;
+        RequestType type = data.getType(), fetchedType = null;
         if (type == null || type.getId() == null) {
             throw new ValidationException("missing request type");
         }
@@ -70,7 +70,7 @@ public class JpaUtils {
         if (fetchedType == null) {
             throw new ValidationException("request type not found:" + type.getId());
         }
-        data.setRequestType(fetchedType);
+        data.setType(fetchedType);
     }
 
     public static void fetchRequirementRequests(RequestRepository repo, Requirement data) {

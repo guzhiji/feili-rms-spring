@@ -39,7 +39,7 @@ public class CheckPoint implements Serializable {
 //    @NotNull(message = "Checkpoint status must not be null.")
     private Status status;
 
-    @Column(nullable = false)
+    @Column(name = "days_left", nullable = false)
     private int daysLeft;
 
     @ManyToOne(optional = false)

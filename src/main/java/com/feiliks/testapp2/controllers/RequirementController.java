@@ -63,7 +63,7 @@ public class RequirementController extends AbstractController {
         User curUser = AuthTokenUtil.getUser(req); // assume protected by TokenAuthInterceptor/Filter
         Set<Request> requests = data.getRequests(); // assume requests been fetched
         for (Request request : requests) {
-            RequestType rtype = request.getRequestType();
+            RequestType rtype = request.getType();
             User manager = rtype.getManager();
             if (manager != null && Objects.equals(manager.getId(), curUser.getId())) {
                 return curUser;
@@ -188,7 +188,7 @@ public class RequirementController extends AbstractController {
         for (Request r : entity.getRequests()) {
             if (Objects.equals(r.getId(), requestid)) {
                 found = true;
-                if (!r.getRequestType().getManager().equals(curUser)) {
+                if (!r.getType().getManager().equals(curUser)) {
                     throw new AuthorizationException();
                 }
             }
