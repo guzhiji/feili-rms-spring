@@ -106,6 +106,10 @@ public class RequirementController extends AbstractController {
         entity.setOwner(getUserIfOneOfTheManagers(req, entity));
         JpaUtils.fetchRequirementParticipants(userRepo, entity);
         JpaUtils.fetchOrCreateRequirementTags(tagRepo, entity);
+        // No checkpoints should belong to multiple requirements.
+        for (CheckPoint cp : entity.getCheckPoints()) {
+            cp.setId(null);
+        }
         entity.setCreated(new Date());
         entity.setModified(entity.getCreated());
 
@@ -143,7 +147,20 @@ public class RequirementController extends AbstractController {
 
         CheckPoint[] orderedCps = entity.getCheckPoints().toArray(new CheckPoint[0]);
         for (int i = 0; i < orderedCps.length; ++i) {
-            orderedCps[i].setOrdinal(i);
+            CheckPoint cp = orderedCps[i];
+            // save manual ordering
+            cp.setOrdinal(i);
+            if (cp.getId() != null) {
+                // force to create a new check point
+                CheckPoint rcp = checkpointRepo.findOne(cp.getId());
+                if (rcp == null) {
+                    // no such existing check point
+                    cp.setId(null);
+                } else if (!Objects.equals(rcp.getRequirement(), original)) {
+                    // belongs to another requirement
+                    cp.setId(null);
+                }
+            }
         }
 
         JpaUtils.fetchRequirementParticipants(userRepo, entity);
