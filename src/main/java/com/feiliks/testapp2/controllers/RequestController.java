@@ -1,10 +1,6 @@
 package com.feiliks.testapp2.controllers;
 
-import com.feiliks.testapp2.AuthTokenUtil;
-import com.feiliks.testapp2.AuthorizationException;
-import com.feiliks.testapp2.JpaUtils;
-import com.feiliks.testapp2.NotFoundException;
-import com.feiliks.testapp2.ValidationException;
+import com.feiliks.testapp2.*;
 import com.feiliks.testapp2.dto.EntityMessage;
 import com.feiliks.testapp2.dto.RequestDTO;
 import com.feiliks.testapp2.dto.RequestStatusDTO;
@@ -12,32 +8,18 @@ import com.feiliks.testapp2.dto.RequirementDTO;
 import com.feiliks.testapp2.jpa.entities.Request;
 import com.feiliks.testapp2.jpa.entities.Requirement;
 import com.feiliks.testapp2.jpa.entities.User;
-import com.feiliks.testapp2.jpa.repositories.RequestRepository;
-import com.feiliks.testapp2.jpa.repositories.RequestTypeRepository;
-import com.feiliks.testapp2.jpa.repositories.RequirementRepository;
-import com.feiliks.testapp2.jpa.repositories.TagRepository;
-import com.feiliks.testapp2.jpa.repositories.UserRepository;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import com.feiliks.testapp2.jpa.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.*;
 
 @RestController
 @RequestMapping("/requests")
@@ -58,7 +40,7 @@ public class RequestController extends AbstractController {
     @Autowired
     private RequirementRepository requirementRepo;
 
-    @GetMapping
+    @GetMapping("/own")
     @Transactional(readOnly = true)
     public List<RequestDTO> getOwnRequests(HttpServletRequest req) {
         User owner = AuthTokenUtil.getUser(req);
@@ -71,6 +53,21 @@ public class RequestController extends AbstractController {
             out.add(new RequestDTO(r));
         }
         return out;
+    }
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public List<RequestDTO> getRequests(HttpServletRequest req) {
+        return getRequests(req, 1);
+    }
+
+    @GetMapping("/pages/{n}")
+    @Transactional(readOnly = true)
+    public List<RequestDTO> getRequests(
+            HttpServletRequest req,
+            @PathVariable int n) {
+        Page<Request> result = repo.findAll(new PageRequest(n - 1, 10));
+        return convertListItemType(result.getContent(), Request.class, RequestDTO.class);
     }
 
     @PostMapping
@@ -159,12 +156,12 @@ public class RequestController extends AbstractController {
 
     @GetMapping("/{requestid}")
     @Transactional(readOnly = true)
-    public RequestDTO getRequest(@PathVariable Long requestid) {
+    public EntityMessage<RequestDTO> getRequest(@PathVariable Long requestid) {
         Request r = repo.findOne(requestid);
         if (r == null) {
             throw new NotFoundException(Request.class, requestid.toString());
         }
-        return new RequestDTO(r);
+        return new EntityMessage<>("success", new RequestDTO(r));
     }
 
     @DeleteMapping("/{requestid}")
@@ -193,12 +190,9 @@ public class RequestController extends AbstractController {
         if (request == null) {
             throw new NotFoundException(Request.class, requestid.toString());
         }
-        Set<Requirement> requirements = request.getRequirements();
-        List<RequirementDTO> out = new ArrayList<>();
-        for (Requirement requirement : requirements) {
-            out.add(new RequirementDTO(requirement));
-        }
-        return out;
+        return convertListItemType(
+                request.getRequirements(),
+                Requirement.class, RequirementDTO.class);
     }
 
     @PostMapping("/{requestid}/requirements")
@@ -217,6 +211,9 @@ public class RequestController extends AbstractController {
         if (request == null) {
             throw new NotFoundException(Request.class, requestid.toString());
         }
+        if (request.getStatus().equals(Request.Status.CLOSED)) {
+            throw new ValidationException(String.format("Request %d is closed.", requestid));
+        }
         // 3. is manager
         User owner = AuthTokenUtil.getUser(req);
         User manager = request.getType().getManager();
@@ -226,7 +223,7 @@ public class RequestController extends AbstractController {
 
         Requirement entity = data.toEntity();
         entity.setOwner(owner);
-        entity.setRequests(new HashSet(Arrays.asList(request))); // overwrite request id received in body
+        entity.setRequests(new HashSet<>(Arrays.asList(request))); // overwrite request id received in body
         JpaUtils.fetchRequirementParticipants(userRepo, entity);
         JpaUtils.fetchOrCreateRequirementTags(tagRepo, entity);
         entity.setCreated(new Date());

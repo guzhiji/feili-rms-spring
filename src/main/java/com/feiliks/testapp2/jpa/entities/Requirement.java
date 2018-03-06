@@ -4,23 +4,19 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.Lob;
-import javax.persistence.OneToMany;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "rms_requirement")
+@NamedQuery(
+        name = "Requirement.findParticipated",
+        query = "select r from Requirement r JOIN r.participants u where u.id = ?1"
+)
+@NamedNativeQuery(
+        name = "Requirement.findParticipated2",
+        query = "select r.* from rms_requirement r inner join rms_requirement_participant u on u.requirement_id = r.id where u.participant_id = ?1 limit ?2,?3",
+        resultClass = Requirement.class
+)
 public class Requirement implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -30,8 +26,6 @@ public class Requirement implements Serializable {
     private Long id;
 
     @Column(nullable = false, length = 127)
-//    @NotNull(message = "Requirement title must not be null.")
-//    @Size(min = 1, max = 127, message = "Requirement title is invalid (1-127 characters).")
     private String title;
 
     @Column(nullable = false)
@@ -51,18 +45,30 @@ public class Requirement implements Serializable {
     private User owner;
 
     @ManyToMany
-    @JoinTable(name = "rms_requirement_requests")
+    @JoinTable(
+            name = "rms_requirement_request",
+            joinColumns = @JoinColumn(name = "requirement_id"),
+            inverseJoinColumns = @JoinColumn(name = "request_id")
+    )
     private Set<Request> requests;
 
     @OneToMany(cascade = {CascadeType.ALL}, mappedBy = "requirement", orphanRemoval = true)
     private Collection<CheckPoint> checkPoints;
 
     @ManyToMany
-    @JoinTable(name = "rms_requirement_participants")
+    @JoinTable(
+            name = "rms_requirement_participant",
+            joinColumns = @JoinColumn(name = "requirement_id"),
+            inverseJoinColumns = @JoinColumn(name = "participant_id")
+    )
     private Collection<User> participants;
 
     @ManyToMany
-    @JoinTable(name = "rms_requirement_tags")
+    @JoinTable(
+            name = "rms_requirement_tag",
+            joinColumns = @JoinColumn(name = "requirement_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
     private Collection<Tag> tags;
 
     public Long getId() {

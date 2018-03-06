@@ -5,13 +5,8 @@ import com.feiliks.testapp2.jpa.entities.Request;
 import com.feiliks.testapp2.jpa.entities.Requirement;
 import com.feiliks.testapp2.jpa.entities.Tag;
 import com.feiliks.testapp2.jpa.entities.User;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -48,7 +43,7 @@ public class RequirementDTO {
         List<CheckPointDTO> cps = new ArrayList<>();
         if (requirement.getCheckPoints() != null) {
             List<CheckPoint> sorted = new ArrayList<>(requirement.getCheckPoints());
-            sorted.sort(new Comparator<CheckPoint>() {
+            Collections.sort(sorted, new Comparator<CheckPoint>() {
                 @Override
                 public int compare(CheckPoint o1, CheckPoint o2) {
                     int c = o1.getOrdinal() - o2.getOrdinal();

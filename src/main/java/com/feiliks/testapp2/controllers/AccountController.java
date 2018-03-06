@@ -1,6 +1,7 @@
 package com.feiliks.testapp2.controllers;
 
 import com.feiliks.testapp2.*;
+import com.feiliks.testapp2.dto.EntityMessage;
 import com.feiliks.testapp2.dto.LoginDTO;
 import com.feiliks.testapp2.dto.Message;
 import com.feiliks.testapp2.dto.UserWithPermissionsDTO;
@@ -54,11 +55,8 @@ public class AccountController extends AbstractController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserWithPermissionsDTO> getCurrentUser(HttpServletRequest req) {
+    public EntityMessage<UserWithPermissionsDTO> getCurrentUser(HttpServletRequest req) {
         User u = AuthTokenUtil.getUser(req);
-        if (u == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(new UserWithPermissionsDTO(u));
+        return new EntityMessage<>("success", new UserWithPermissionsDTO(u));
     }
 }

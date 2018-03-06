@@ -1,10 +1,6 @@
 package com.feiliks.testapp2.controllers;
 
-import com.feiliks.testapp2.AuthTokenUtil;
-import com.feiliks.testapp2.AuthorizationException;
-import com.feiliks.testapp2.JpaUtils;
-import com.feiliks.testapp2.NotFoundException;
-import com.feiliks.testapp2.ValidationException;
+import com.feiliks.testapp2.*;
 import com.feiliks.testapp2.dto.CheckPointStatusDTO;
 import com.feiliks.testapp2.dto.EntityMessage;
 import com.feiliks.testapp2.dto.RequirementDTO;
@@ -28,6 +24,8 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -80,7 +78,7 @@ public class RequirementController extends AbstractController {
         return entity;
     }
 
-    @GetMapping
+    @GetMapping("/own")
     @Transactional(readOnly = true)
     public List<RequirementDTO> getOwnRequirements(HttpServletRequest req) {
         User owner = AuthTokenUtil.getUser(req);
@@ -89,6 +87,44 @@ public class RequirementController extends AbstractController {
             out.add(new RequirementDTO(r));
         }
         return out;
+    }
+
+    @GetMapping
+    @Transactional(readOnly = true)
+    public List<RequirementDTO> getRequirements(HttpServletRequest req) {
+        return getRequirements(req, 1);
+    }
+
+    @GetMapping("/pages/{n}")
+    @Transactional(readOnly = true)
+    public List<RequirementDTO> getRequirements(
+            HttpServletRequest req,
+            @PathVariable int n) {
+        User owner = AuthTokenUtil.getUser(req);
+        Page<Requirement> page = repo.findByOwner(owner, new PageRequest(n - 1, 10));
+        List<RequirementDTO> out = new ArrayList<>();
+        for (Requirement r : page.getContent())
+            out.add(new RequirementDTO(r));
+        return out;
+    }
+
+    @GetMapping("/participated")
+    @Transactional(readOnly = true)
+    public List<RequirementDTO> getParticiaptedRequirements(HttpServletRequest req) {
+        User owner = AuthTokenUtil.getUser(req);
+        List<Requirement> page = repo.findParticipated(owner.getId());
+        return convertListItemType(page, Requirement.class, RequirementDTO.class);
+    }
+
+    @GetMapping("/participated/pages/{n}")
+    @Transactional(readOnly = true)
+    public List<RequirementDTO> getParticiaptedRequirements(
+            HttpServletRequest req,
+            @PathVariable int n) {
+        User owner = AuthTokenUtil.getUser(req);
+        PageRequest pr = new PageRequest(n - 1, 10);
+        List<Requirement> page = repo.findParticipated2(owner.getId(), pr.getOffset(), pr.getPageSize());
+        return convertListItemType(page, Requirement.class, RequirementDTO.class);
     }
 
     @PostMapping
@@ -104,9 +140,14 @@ public class RequirementController extends AbstractController {
         Requirement entity = data.toEntity();
         JpaUtils.fetchRequirementRequests(requestRepo, entity);
         entity.setOwner(getUserIfOneOfTheManagers(req, entity));
+        for (Request r : entity.getRequests()) {
+            if (r.getStatus().equals(Request.Status.CLOSED)) {
+                throw new ValidationException(String.format("Request %d is closed.", r.getId()));
+            }
+        }
         JpaUtils.fetchRequirementParticipants(userRepo, entity);
         JpaUtils.fetchOrCreateRequirementTags(tagRepo, entity);
-        // No checkpoints should belong to multiple requirements.
+        // Checkpoints shouldn't belong to multiple requirements.
         for (CheckPoint cp : entity.getCheckPoints()) {
             cp.setId(null);
         }
@@ -177,8 +218,9 @@ public class RequirementController extends AbstractController {
 
     @GetMapping("/{requirementid}")
     @Transactional(readOnly = true)
-    public RequirementDTO getRequirement(@PathVariable Long requirementid) {
-        return new RequirementDTO(getRequirementOrRaiseEx(requirementid));
+    public EntityMessage<RequirementDTO> getRequirement(@PathVariable Long requirementid) {
+        return new EntityMessage<>("success", new RequirementDTO(
+                getRequirementOrRaiseEx(requirementid)));
     }
 
     @DeleteMapping("/{requirementid}")

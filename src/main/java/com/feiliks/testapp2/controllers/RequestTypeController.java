@@ -38,12 +38,8 @@ public class RequestTypeController extends AbstractController {
 
     @GetMapping
     @Transactional(readOnly = true)
-    public List<RequestTypeDTO> getRequestTypes() {
-        List<RequestTypeDTO> out = new ArrayList<>();
-        for (RequestType rt : repo.findAll()) {
-            out.add(new RequestTypeDTO(rt));
-        }
-        return out;
+    public EntityMessage<List<RequestTypeDTO>> getRequestTypes() {
+        return respondListWithType(repo.findAll(), RequestType.class, RequestTypeDTO.class);
     }
 
     @PostMapping
@@ -94,12 +90,12 @@ public class RequestTypeController extends AbstractController {
 
     @GetMapping("/{typeid}")
     @Transactional(readOnly = true)
-    public RequestTypeDTO getRequestType(@PathVariable Long typeid) {
+    public EntityMessage<RequestTypeDTO> getRequestType(@PathVariable Long typeid) {
         RequestType rt = repo.findOne(typeid);
         if (rt == null) {
             throw new NotFoundException(RequestType.class, typeid.toString());
         }
-        return new RequestTypeDTO(rt);
+        return new EntityMessage<>("success", new RequestTypeDTO(rt));
     }
 
     @DeleteMapping("/{typeid}")
