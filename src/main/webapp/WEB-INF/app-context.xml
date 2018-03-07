@@ -94,6 +94,7 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 
     <jpa:repositories base-package="com.feiliks.testapp2.jpa.repositories" />
 
+    <!--<mvc:resources mapping="/static/**" location="/static/" />-->
     <mvc:cors>
         <mvc:mapping path="/**" />
     </mvc:cors>

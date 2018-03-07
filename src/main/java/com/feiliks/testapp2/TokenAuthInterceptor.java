@@ -6,9 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public class TokenAuthInterceptor extends HandlerInterceptorAdapter {
 
     public final static String DEFAULT_TOKEN_HEADER = "X-TOKEN";
+    private final static Set<String> allowedMethods = new HashSet<>(
+            Arrays.asList("GET", "POST", "PUT", "DELETE"));
     private String tokenHeaderName;
 
     @Autowired
@@ -28,6 +34,9 @@ public class TokenAuthInterceptor extends HandlerInterceptorAdapter {
             HttpServletResponse response,
             Object handler)
             throws Exception {
+        if (!allowedMethods.contains(request.getMethod())) {
+            return true;
+        }
         String headerName = tokenHeaderName;
         if (headerName == null) {
             headerName = DEFAULT_TOKEN_HEADER;
