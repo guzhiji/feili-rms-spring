@@ -21,7 +21,7 @@ public class RequestTypeDTO {
     public RequestTypeDTO(RequestType requestType) {
         id = requestType.getId();
         name = requestType.getName();
-        manager = new UserDTO(requestType.getManager());
+        manager = requestType.getManager() == null ? null : new UserDTO(requestType.getManager());
     }
 
     public RequestType toEntity() {

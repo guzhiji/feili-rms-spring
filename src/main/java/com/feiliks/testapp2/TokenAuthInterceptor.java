@@ -30,11 +30,11 @@ public class TokenAuthInterceptor extends HandlerInterceptorAdapter {
 
     @Override
     public boolean preHandle(
-            HttpServletRequest request,
-            HttpServletResponse response,
+            HttpServletRequest req,
+            HttpServletResponse res,
             Object handler)
             throws Exception {
-        if (!allowedMethods.contains(request.getMethod())) {
+        if (!allowedMethods.contains(req.getMethod())) {
             return true;
         }
         String headerName = tokenHeaderName;
@@ -42,12 +42,10 @@ public class TokenAuthInterceptor extends HandlerInterceptorAdapter {
             headerName = DEFAULT_TOKEN_HEADER;
         }
         try {
-            HttpServletRequest req = (HttpServletRequest) request;
             String token = req.getHeader(headerName);
             AuthToken authentication = AuthTokenUtil.check(req, token);
 
             // refresh token
-            HttpServletResponse res = (HttpServletResponse) response;
             res.setHeader(headerName, AuthTokenUtil.create(
                     AuthTokenUtil.getUser(req),
                     keyPairProvider.getSigner()).getEncoded());
@@ -57,7 +55,7 @@ public class TokenAuthInterceptor extends HandlerInterceptorAdapter {
         } catch (Exception ex) {
 
             SecurityContextHolder.clearContext();
-            ((HttpServletResponse) response).sendError(
+            res.sendError(
                     HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
             return false;
         }

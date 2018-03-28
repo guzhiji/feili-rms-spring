@@ -102,7 +102,6 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
         <mvc:interceptor>
             <mvc:mapping path="/**" />
             <mvc:exclude-mapping path="/account/login" />
-            <mvc:exclude-mapping path="/users" />
             <bean class="com.feiliks.testapp2.TokenAuthInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>

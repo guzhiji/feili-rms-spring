@@ -1,15 +1,13 @@
 package com.feiliks.testapp2.controllers;
 
 import com.feiliks.testapp2.*;
-import com.feiliks.testapp2.dto.EntityMessage;
-import com.feiliks.testapp2.dto.LoginDTO;
-import com.feiliks.testapp2.dto.Message;
-import com.feiliks.testapp2.dto.UserWithPermissionsDTO;
+import com.feiliks.testapp2.dto.*;
 import com.feiliks.testapp2.jpa.entities.User;
 import com.feiliks.testapp2.jpa.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,4 +57,43 @@ public class AccountController extends AbstractController {
         User u = AuthTokenUtil.getUser(req);
         return new EntityMessage<>("success", new UserWithPermissionsDTO(u));
     }
+
+    @PutMapping("/me")
+    public ResponseEntity<Message> updateCurrentUser(
+            HttpServletRequest req,
+            @RequestBody @Valid UserDTO data,
+            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
+        User u = AuthTokenUtil.getUser(req);
+        u.setEmail(data.getEmail());
+        u.setPhone(data.getPhone());
+        userRepository.save(u);
+        Message msg = new Message("success", "User profile is updated.");
+        return ResponseEntity.accepted().body(msg);
+    }
+
+    @PutMapping("/password")
+    @Transactional
+    public ResponseEntity<Message> updatePassword(
+            HttpServletRequest req,
+            @RequestBody @Valid PasswordDTO data,
+            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult);
+        }
+        User entity = AuthTokenUtil.getUser(req);
+        String hashed = PasswordUtil.hash(entity.getUsername(), data.getOriginal());
+        if (hashed.equals(entity.getPassword())) {
+            entity.setPassword(PasswordUtil.hash(entity.getUsername(), data.getPassword()));
+            userRepository.save(entity);
+            Message msg = new Message("success", "Password is updated.");
+            return ResponseEntity.accepted().body(msg);
+        } else {
+            Message msg = new Message("failure", "Original password is incorrect.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(msg);
+        }
+    }
+
 }

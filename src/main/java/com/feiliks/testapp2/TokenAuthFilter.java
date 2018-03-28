@@ -1,9 +1,7 @@
 package com.feiliks.testapp2;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -20,6 +18,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class TokenAuthFilter implements Filter {
 
     public final static String DEFAULT_TOKEN_HEADER = "X-TOKEN";
+    private final static Set<String> allowedMethods = new HashSet<>(
+            Arrays.asList("GET", "POST", "PUT", "DELETE"));
     private List<AntPathRequestMatcher> protectedPaths;
     private List<AntPathRequestMatcher> openPaths;
     private String tokenHeaderName;
@@ -87,6 +87,9 @@ public class TokenAuthFilter implements Filter {
     }
 
     private boolean shouldAuthenticate(HttpServletRequest request) {
+        if (!allowedMethods.contains(request.getMethod())) {
+            return false;
+        }
         if (openPaths != null) {
             for (AntPathRequestMatcher m : openPaths) {
                 if (m.matches(request)) {

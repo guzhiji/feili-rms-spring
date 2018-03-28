@@ -52,8 +52,10 @@ class UserController extends AbstractController {
     @PostMapping
     @Transactional
     public ResponseEntity<EntityMessage<UserDTO>> createUser(
+            HttpServletRequest req,
             @RequestBody @Valid User data,
             BindingResult bindingResult) {
+        requiresPermissions(req, User.Permission.MANAGE_USERS);
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
@@ -69,9 +71,11 @@ class UserController extends AbstractController {
     @PutMapping("/{userid}")
     @Transactional
     public ResponseEntity<EntityMessage<UserDTO>> updateUser(
+            HttpServletRequest req,
             @PathVariable Long userid,
             @RequestBody @Valid UserDTO data,
             BindingResult bindingResult) {
+        requiresPermissions(req, User.Permission.MANAGE_USERS);
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
@@ -86,32 +90,30 @@ class UserController extends AbstractController {
 
     @PutMapping("/{userid}/password")
     @Transactional
-    public ResponseEntity<Message> updatePassword(
+    public ResponseEntity<Message> resetPassword(
+            HttpServletRequest req,
             @PathVariable Long userid,
             @RequestBody @Valid PasswordDTO data,
             BindingResult bindingResult) {
+        requiresPermissions(req, User.Permission.MANAGE_USERS);
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
         User entity = getUserOrRaiseEx(userid);
-        String hashed = PasswordUtil.hash(entity.getUsername(), data.getOriginal());
-        if (hashed.equals(entity.getPassword())) {
-            entity.setPassword(PasswordUtil.hash(entity.getUsername(), data.getPassword()));
-            userRepository.save(entity);
-            Message msg = new Message("success", "Password is updated.");
-            return ResponseEntity.accepted().body(msg);
-        } else {
-            Message msg = new Message("failure", "Original password is incorrect.");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(msg);
-        }
+        entity.setPassword(PasswordUtil.hash(entity.getUsername(), data.getPassword()));
+        userRepository.save(entity);
+        Message msg = new Message("success", "Password is reset.");
+        return ResponseEntity.accepted().body(msg);
     }
 
     @PutMapping("/{userid}/permissions")
     @Transactional
     public ResponseEntity<Message> updatePermissions(
+            HttpServletRequest req,
             @PathVariable Long userid,
             @RequestBody @Valid PermissionsDTO data,
             BindingResult bindingResult) {
+        requiresPermissions(req, User.Permission.MANAGE_USERS);
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
