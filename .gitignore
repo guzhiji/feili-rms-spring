@@ -1,5 +1,6 @@
 target
 package.sh
+*.log
 *.bak
 *~
 .*.bak

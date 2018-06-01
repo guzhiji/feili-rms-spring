@@ -13,6 +13,7 @@
         <class>com.feiliks.testapp2.jpa.entities.Requirement</class>
         <class>com.feiliks.testapp2.jpa.entities.Tag</class>
         <class>com.feiliks.testapp2.jpa.entities.User</class>
+        <class>com.feiliks.testapp2.blog.Blog</class>
         <exclude-unlisted-classes/>
         <properties>
             <!--<property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/sample"/>-->
