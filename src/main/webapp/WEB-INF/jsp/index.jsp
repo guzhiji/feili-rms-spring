@@ -13,38 +13,51 @@
     <body>
         <div class="top-bar">
             <div class="top-bar-left">
-                <ul class="dropdown menu" data-dropdown-menu>
-                    <li class="menu-text">Site Title</li>
-                    <li><a href="/rms-spring-app-0.1.0/app/blog/">Home</a></li>
-                    <li><a href="/rms-spring-app-0.1.0/app/blog/admin?page=1">Admin</a></li>
-                    <li>
-                        <a href="#">Account</a>
-                        <ul class="menu vertical">
-                            <li><a href="#">One</a></li>
-                            <li><a href="#">Two</a></li>
-                            <li><a href="/rms-spring-app-0.1.0/app/blog/logout">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-            <div class="top-bar-right">
                 <ul class="menu">
+                    <li class="menu-text">Site Title</li>
+                    <li><a href="${contextPath}/">Home</a></li>
+                    <c:if test="${user == null}">
+                        <li><a href="${contextPath}/login">Login</a></li>
+                    </c:if>
+                    <c:if test="${user != null}">
+                        <li><a href="${contextPath}/admin">Admin</a></li>
+                    </c:if>
                     <li><input type="search" placeholder="Search"></li>
                     <li><button type="button" class="button">Search</button></li>
                 </ul>
             </div>
+            <div class="top-bar-right">
+                <c:if test="${user != null}">
+                    <ul class="dropdown menu" data-dropdown-menu>
+                        <li>
+                            <a href="#">Account</a>
+                            <ul class="menu vertical">
+                                <li><a href="${contextPath}/chpwd">Change Password</a></li>
+                                <li><a href="${contextPath}/logout">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </c:if>
+            </div>
         </div>
         <div class="grid-container">
-            <c:forEach items="${blogs}" var="blog">
-                <div class="grid-x grid-padding-x">
-                    <div class="large-12 cell">
+            <div class="grid-x grid-padding-x">
+                <div class="large-12 cell">
+                    <c:forEach items="${blogs}" var="blog">
                         <div class="primary callout">
-                            <a href="/rms-spring-app-0.1.0/app/blog/view/${blog.slug}"><h3>${blog.title}</h3></a>
-                            ${blog.modified} - ${blog.owner.username}
+                            <a href="${contextPath}/view/${blog.slug}"><h3>${blog.title}</h3></a>
+                            <div>
+                                ${blog.modified} - ${blog.owner.username}
+                            </div>
+                            <div>
+                                <c:forEach items="${blog.tags}" var="tag">
+                                    <span class="label success"><c:out value="${tag.name}" /></span>
+                                </c:forEach>
+                            </div>
                         </div>
-                    </div>
+                    </c:forEach>
                 </div>
-            </c:forEach>
+            </div>
 
             <div class="grid-x grid-padding-x">
                 <div class="large-6 medium-6 cell">

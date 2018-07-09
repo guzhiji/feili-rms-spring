@@ -91,21 +91,18 @@ public class RequirementController extends AbstractController {
 
     @GetMapping
     @Transactional(readOnly = true)
-    public List<RequirementDTO> getRequirements(HttpServletRequest req) {
+    public EntityMessage<List<RequirementDTO>> getRequirements(HttpServletRequest req) {
         return getRequirements(req, 1);
     }
 
     @GetMapping("/pages/{n}")
     @Transactional(readOnly = true)
-    public List<RequirementDTO> getRequirements(
+    public EntityMessage<List<RequirementDTO>> getRequirements(
             HttpServletRequest req,
             @PathVariable int n) {
         User owner = AuthTokenUtil.getUser(req);
         Page<Requirement> page = repo.findByOwner(owner, new PageRequest(n - 1, 10));
-        List<RequirementDTO> out = new ArrayList<>();
-        for (Requirement r : page.getContent())
-            out.add(new RequirementDTO(r));
-        return out;
+        return respondListWithType(page.getContent(), Requirement.class, RequirementDTO.class);
     }
 
     @GetMapping("/participated")

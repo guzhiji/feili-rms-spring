@@ -57,17 +57,17 @@ public class RequestController extends AbstractController {
 
     @GetMapping
     @Transactional(readOnly = true)
-    public List<RequestDTO> getRequests(HttpServletRequest req) {
+    public EntityMessage<List<RequestDTO>> getRequests(HttpServletRequest req) {
         return getRequests(req, 1);
     }
 
     @GetMapping("/pages/{n}")
     @Transactional(readOnly = true)
-    public List<RequestDTO> getRequests(
+    public EntityMessage<List<RequestDTO>> getRequests(
             HttpServletRequest req,
             @PathVariable int n) {
         Page<Request> result = repo.findAll(new PageRequest(n - 1, 10));
-        return convertListItemType(result.getContent(), Request.class, RequestDTO.class);
+        return respondListWithType(result.getContent(), Request.class, RequestDTO.class);
     }
 
     @PostMapping

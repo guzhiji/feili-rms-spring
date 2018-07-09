@@ -9,28 +9,30 @@
         <title>Edit: ${blog.title}</title>
         <link rel="stylesheet" href="http://localhost:8080/rms-spring-app-0.1.0/css/foundation.css">
         <link rel="stylesheet" href="http://localhost:8080/rms-spring-app-0.1.0/css/app.css">
+        <script type="text/javascript" charset="utf-8" src="/rms-spring-app-0.1.0/ueditor/ueditor.config.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/rms-spring-app-0.1.0/ueditor/ueditor.all.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/rms-spring-app-0.1.0/ueditor/lang/zh-cn/zh-cn.js"></script>
     </head>
     <body>
         <div class="top-bar">
             <div class="top-bar-left">
-                <ul class="dropdown menu" data-dropdown-menu>
+                <ul class="menu">
                     <li class="menu-text">Site Title</li>
-                    <li><a href="/rms-spring-app-0.1.0/app/blog/">Home</a></li>
-                    <li><a href="#">Three</a></li>
-                    <li>
-                        <a href="#">Account</a>
-                        <ul class="menu vertical">
-                            <li><a href="#">One</a></li>
-                            <li><a href="#">Two</a></li>
-                            <li><a href="/rms-spring-app-0.1.0/app/blog/logout">Logout</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="${contextPath}/">Home</a></li>
+                    <li><a href="${contextPath}/admin">Admin</a></li>
+                    <li><input type="search" placeholder="Search"></li>
+                    <li><button type="button" class="button">Search</button></li>
                 </ul>
             </div>
             <div class="top-bar-right">
-                <ul class="menu">
-                    <li><input type="search" placeholder="Search"></li>
-                    <li><button type="button" class="button">Search</button></li>
+                <ul class="dropdown menu" data-dropdown-menu>
+                    <li>
+                        <a href="#">Account</a>
+                        <ul class="menu vertical">
+                            <li><a href="${contextPath}/chpwd">Change Password</a></li>
+                            <li><a href="${contextPath}/logout">Logout</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -46,6 +48,10 @@
                                     <input name="title" type="text" placeholder="title" value="${blog.title}" />
                                 </div>
                                 <div class="large-12 cell">
+                                    <label>Title in Path</label>
+                                    <input name="slug" type="text" placeholder="slug" value="${blog.slug}" />
+                                </div>
+                                <div class="large-12 cell">
                                     <c:choose>
                                         <c:when test="${blog.published}">
                                             <input id="published" name="published" type="checkbox" value="yes" checked="checked">
@@ -57,14 +63,28 @@
                                     <label for="published">Published</label>
                                 </div>
                                 <div class="large-12 cell">
+                                    <label>Tags</label>
+                                    <input name="tags" type="text" placeholder="tags" value="${blog.tags}" />
+                                </div>
+                                <div class="large-12 cell">
                                     <label>Content</label>
-                                    <textarea name="content">${blog.content}</textarea>
+                                    <textarea name="content" id="editor">${blog.content}</textarea>
+                                    <script type="text/javascript">UE.getEditor('editor').setEnabled();</script>
+                                </div>
+                                <div class="large-12 cell">
+                                    <input type="submit" class="button" value="SAVE" />
+                                    <c:choose>
+                                        <c:when test="${not empty blog.slug}">
+                                            <a class="button secondary" href="${contextPath}/view/${blog.slug}">CANCEL</a>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <a class="button secondary" href="${contextPath}/admin/">BACK</a>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                             </div>
-                        </div>
-                        <input type="submit" class="button" value="SAVE" />
-                        <a class="button" href="/rms-spring-app-0.1.0/app/blog/view/${blog.slug}">CANCEL</a>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>

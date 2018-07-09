@@ -8,3 +8,6 @@ package.sh
 .idea
 .vscode
 *.iml
+src/main/webapp/static
+src/main/webapp/asset-manifest.json
+src/main/webapp/favicon.ico

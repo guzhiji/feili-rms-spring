@@ -13,25 +13,37 @@
     <body>
         <div class="top-bar">
             <div class="top-bar-left">
-                <ul class="dropdown menu" data-dropdown-menu>
+                <ul class="menu">
                     <li class="menu-text">Site Title</li>
-                    <li><a href="/rms-spring-app-0.1.0/app/blog/">Home</a></li>
-                    <li><a href="/rms-spring-app-0.1.0/app/blog/edit">New Blog</a></li>
-                    <li>
-                        <a href="#">Account</a>
-                        <ul class="menu vertical">
-                            <li><a href="#">One</a></li>
-                            <li><a href="#">Two</a></li>
-                            <li><a href="/rms-spring-app-0.1.0/app/blog/logout">Logout</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="${contextPath}/">Home</a></li>
+                    <c:if test="${user == null}">
+                        <li><a href="${contextPath}/login">Login</a></li>
+                    </c:if>
+                    <c:if test="${user != null}">
+                        <li><a href="${contextPath}/admin">Admin</a></li>
+                    </c:if>
+                    <li><input type="search" placeholder="Search"></li>
+                    <li><button type="button" class="button">Search</button></li>
+                    <c:if test="${user != null}">
+                        <li><a href="${contextPath}/edit" class="button success">New Blog</a></li>
+                        <c:if test="${user == blog.owner}">
+                            <li><a href="${contextPath}/edit/${blog.id}" class="button success">Edit</a></li>
+                        </c:if>
+                    </c:if>
                 </ul>
             </div>
             <div class="top-bar-right">
-                <ul class="menu">
-                    <li><input type="search" placeholder="Search"></li>
-                    <li><button type="button" class="button">Search</button></li>
-                </ul>
+                <c:if test="${user != null}">
+                    <ul class="dropdown menu" data-dropdown-menu>
+                        <li>
+                            <a href="#">Account</a>
+                            <ul class="menu vertical">
+                                <li><a href="${contextPath}/chpwd">Change Password</a></li>
+                                <li><a href="${contextPath}/logout">Logout</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </c:if>
             </div>
         </div>
 
@@ -40,10 +52,18 @@
                 <div class="large-12 cell">
                     <div class="callout">
                         <h1>${blog.title}</h1>
-                        <div>Created: <c:out value=" ${blog.created}" /></div>
-                        <div>Modified: <c:out value=" ${blog.modified}" /></div>
-                        <div>Owner: ${blog.owner.username}</div>
-                        <div><a class="button" href="/rms-spring-app-0.1.0/app/blog/edit/${blog.id}">Edit</a></div>
+                        <div class="primary callout">
+                            <div>
+                                Tags:
+                                <c:forEach items="${blog.tags}" var="tag">
+                                    <span class="label success"><c:out value="${tag.name}" /></span>
+                                </c:forEach>
+                            </div>
+                            <div>Author: ${blog.owner.username}</div>
+                            <div>Created: <c:out value=" ${blog.created}" /></div>
+                            <div>Modified: <c:out value=" ${blog.modified}" /></div>
+                        </div>
+                        <p></p>
                         ${blog.content}
                     </div>
                 </div>

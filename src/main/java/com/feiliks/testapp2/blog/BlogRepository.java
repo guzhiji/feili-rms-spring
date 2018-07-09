@@ -9,6 +9,10 @@ public interface BlogRepository extends PagingAndSortingRepository<Blog, Long> {
 
     Blog findBySlug(String slug);
 
+    Blog findBySlugAndOwner(String slug, User user);
+
+    boolean existsBySlug(String slug);
+
     Iterable<Blog> findPublished();
 
     Iterable<Blog> findRecentActive();

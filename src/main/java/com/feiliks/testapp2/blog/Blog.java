@@ -26,7 +26,7 @@ import javax.persistence.TemporalType;
 @NamedQueries({
     @NamedQuery(
             name = "Blog.findPublished",
-            query = "select b from Blog b where b.published=true order by b.created desc"
+            query = "select b from Blog b where b.published=true order by b.modified desc"
     )
     ,
     @NamedQuery(
@@ -42,7 +42,7 @@ public class Blog implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 32)
+    @Column(nullable = true, unique = true, length = 32)
     private String slug;
 
     @Column(nullable = false, length = 127)

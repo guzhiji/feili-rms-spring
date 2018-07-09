@@ -2,6 +2,7 @@ package com.feiliks.testapp2.blog;
 
 import com.feiliks.testapp2.AuthorizationException;
 import com.feiliks.testapp2.NotFoundException;
+import com.feiliks.testapp2.PasswordUtil;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.stereotype.Controller;
@@ -10,11 +11,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import com.feiliks.testapp2.dto.LoginDTO;
+import com.feiliks.testapp2.dto.PasswordDTO;
+import com.feiliks.testapp2.jpa.entities.Tag;
 import com.feiliks.testapp2.jpa.entities.User;
+import com.feiliks.testapp2.jpa.repositories.TagRepository;
 import com.feiliks.testapp2.jpa.repositories.UserRepository;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +31,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping(value = "/blog")
@@ -34,6 +42,9 @@ public class BlogController {
 
     @Autowired
     private UserRepository userRepo;
+
+    @Autowired
+    private TagRepository tagRepo;
 
     @ExceptionHandler(AuthorizationException.class)
     protected String handleAuthorization(AuthorizationException ex) {
@@ -46,9 +57,19 @@ public class BlogController {
     }
 
     protected void checkAuth(HttpServletRequest req) {
+        checkAuth(req, null);
+    }
+
+    protected void checkAuth(HttpServletRequest req, User user) {
         HttpSession session = req.getSession();
         if (session == null || session.getAttribute("username") == null) {
             throw new AuthorizationException();
+        }
+        if (user != null) {
+            if (user.getUsername() == null
+                    || !user.getUsername().equals(session.getAttribute("username"))) {
+                throw new AuthorizationException();
+            }
         }
     }
 
@@ -64,15 +85,48 @@ public class BlogController {
         return userRepo.findByUsername((String) username);
     }
 
+    protected void checkTags(Collection<Tag> original, Collection<Tag> updated) {
+        Set<Tag> tagsToAdd = new HashSet<>(), tagsToRemove = new HashSet<>(),
+                updatedFetched = new HashSet<>();
+        for (Tag tag : updated) {
+            String tname = tag.getName();
+            if (tname == null || tname.trim().isEmpty()) {
+                continue;
+            }
+            Tag old = tagRepo.findByName(tname);
+            if (old == null) { // completely new tag
+                old = tagRepo.save(tag);
+                tagsToAdd.add(old);
+                updatedFetched.add(old);
+            } else {
+                if (!original.contains(old)) { // existing new tag
+                    tagsToAdd.add(old);
+                }
+                updatedFetched.add(old);
+            }
+        }
+        for (Tag tag : original) {
+            if (!updatedFetched.contains(tag)) {
+                tagsToRemove.add(tag);
+            }
+        }
+        original.addAll(tagsToAdd);
+        original.removeAll(tagsToRemove);
+    }
+
     @GetMapping
-    public ModelAndView indexPage() {
+    public ModelAndView indexPage(HttpServletRequest req) {
         Map<String, Object> data = new HashMap<>();
         data.put("blogs", blogRepo.findPublished());
+        data.put("user", getUser(req));
+        data.put("contextPath", req.getContextPath() + "/app/blog");
         return new ModelAndView("index", data);
     }
 
     @GetMapping("/admin")
-    public ModelAndView adminPage(HttpServletRequest req, @RequestParam("page") Integer page) {
+    public ModelAndView adminPage(
+            HttpServletRequest req,
+            @RequestParam(name = "page", required = false) Integer page) {
         checkAuth(req);
         Map<String, Object> data = new HashMap<>();
         User user = getUser(req);
@@ -87,41 +141,41 @@ public class BlogController {
         data.put("page_number", pager.getPageNumber());
         data.put("page_size", pager.getPageSize());
         data.put("blogs", blogs);
+        data.put("contextPath", req.getContextPath() + "/app/blog");
         return new ModelAndView("admin", data);
     }
 
     @GetMapping("/edit")
-    public ModelAndView createBlogPage(HttpServletRequest req) {
-        checkAuth(req);
-        Map<String, Object> data = new HashMap<>();
-        data.put("blog", new Blog());
-        return new ModelAndView("edit", data);
-    }
-
-    @PostMapping("/edit")
-    public String createBlog(HttpServletRequest req, @ModelAttribute Blog blog) {
+    public String createBlogPage(HttpServletRequest req) {
         checkAuth(req);
         User user = getUser(req);
-        blog.setSlug(blog.getTitle());
-        blog.setOwner(user);
-        Date now = new Date();
-        blog.setCreated(now);
-        blog.setModified(now);
-        blogRepo.save(blog);
-        return "redirect:/app/blog/";
+        Blog entity = blogRepo.findBySlugAndOwner(null, user);
+        if (entity == null) {
+            entity = new Blog();
+            entity.setSlug(null);
+            entity.setTitle("[new]");
+            entity.setPublished(false);
+            entity.setOwner(user);
+            Date now = new Date();
+            entity.setCreated(now);
+            entity.setModified(now);
+            entity = blogRepo.save(entity);
+        }
+        return "redirect:/app/blog/edit/" + entity.getId();
     }
 
     @GetMapping("/edit/{id}")
     public ModelAndView editBlogPage(
             HttpServletRequest req,
             @PathVariable Long id) {
-        checkAuth(req);
         Blog blog = blogRepo.findOne(id);
         if (blog == null) {
             throw new NotFoundException(Blog.class, id.toString());
         }
+        checkAuth(req, blog.getOwner());
         Map<String, Object> data = new HashMap<>();
-        data.put("blog", blog);
+        data.put("blog", new BlogDTO(blog));
+        data.put("contextPath", req.getContextPath() + "/app/blog");
         return new ModelAndView("edit", data);
     }
 
@@ -129,16 +183,19 @@ public class BlogController {
     public String updateBlog(
             HttpServletRequest req,
             @PathVariable Long id,
-            @ModelAttribute Blog blog) {
-        checkAuth(req);
+            @ModelAttribute BlogDTO blog) {
         Blog original = blogRepo.findOne(id);
         if (original == null) {
             throw new NotFoundException(Blog.class, id.toString());
         }
-        original.setTitle(blog.getTitle());
-        original.setContent(blog.getContent());
-        original.setPublished(blog.isPublished());
+        checkAuth(req, original.getOwner());
+        Blog entity = blog.toEntity();
+        original.setSlug(entity.getSlug());
+        original.setPublished(entity.isPublished());
+        original.setTitle(entity.getTitle());
+        original.setContent(entity.getContent());
         original.setModified(new Date());
+        checkTags(original.getTags(), entity.getTags());
         blogRepo.save(original);
         return "redirect:/app/blog/edit/" + id;
     }
@@ -151,27 +208,34 @@ public class BlogController {
         }
         Map<String, Object> data = new HashMap<>();
         data.put("blog", blog);
+        data.put("user", getUser(req));
+        data.put("contextPath", req.getContextPath() + "/app/blog");
         return new ModelAndView("blog", data);
     }
 
     @GetMapping("/login")
-    public String loginPage(HttpServletRequest req) {
+    public ModelAndView loginPage(HttpServletRequest req) {
         HttpSession session = req.getSession();
         if (session != null && session.getAttribute("username") != null) {
-            return "redirect:/app/blog/admin";
+            return new ModelAndView("redirect:/app/blog/admin");
         }
-        return "login";
+        Map<String, Object> data = new HashMap<>();
+        data.put("contextPath", req.getContextPath() + "/app/blog");
+        return new ModelAndView("login", data);
     }
 
     @PostMapping("/login")
     public String login(
             HttpServletRequest req,
-            @ModelAttribute LoginDTO login) {
-        if (login.getPassword().equals("abcabc")) {
+            @ModelAttribute LoginDTO login,
+            RedirectAttributes redirectAtts) {
+        User user = userRepo.findByUsername(login.getUsername());
+        if (user != null && PasswordUtil.hash(user.getUsername(), login.getPassword()).equals(user.getPassword())) {
             HttpSession session = req.getSession(true);
             session.setAttribute("username", login.getUsername());
-            return "redirect:/app/blog/admin?page=1";
+            return "redirect:/app/blog/admin";
         }
+        redirectAtts.addFlashAttribute("error_message", "Failed to login");
         return logout(req);
     }
 
@@ -182,6 +246,51 @@ public class BlogController {
             session.invalidate();
         }
         return "redirect:/app/blog/login";
+    }
+
+    @GetMapping("/chpwd")
+    public ModelAndView chPwdPage(HttpServletRequest req) {
+        checkAuth(req);
+        Map<String, Object> data = new HashMap<>();
+        data.put("contextPath", req.getContextPath() + "/app/blog");
+        return new ModelAndView("chpwd", data);
+    }
+
+    @PostMapping("/chpwd")
+    public String chPwd(
+            HttpServletRequest req,
+            @ModelAttribute PasswordDTO pass,
+            RedirectAttributes redirectAtts) {
+        checkAuth(req);
+        User user = getUser(req);
+        if (PasswordUtil.hash(user.getUsername(), pass.getOriginal()).equals(user.getPassword())) {
+            user.setPassword(PasswordUtil.hash(user.getUsername(), pass.getPassword()));
+            userRepo.save(user);
+            redirectAtts.addFlashAttribute("message", "Your password has been updated.");
+        } else {
+            redirectAtts.addFlashAttribute("error_message", "Original password is incorrect.");
+        }
+        return "redirect:/app/blog/chpwd";
+    }
+
+    @GetMapping("/adduser")
+    public ModelAndView addUserPage(HttpServletRequest req) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("contextPath", req.getContextPath() + "/app/blog");
+        return new ModelAndView("adduser", data);
+    }
+
+    @PostMapping("/adduser")
+    public String addUser(
+            HttpServletRequest req,
+            @ModelAttribute LoginDTO login,
+            RedirectAttributes redirectAtts) {
+        User user = new User();
+        user.setUsername(login.getUsername());
+        user.setPassword(PasswordUtil.hash(login.getUsername(), login.getPassword()));
+        userRepo.save(user);
+        redirectAtts.addFlashAttribute("message", "User " + user.getUsername() + " is created.");
+        return "redirect:/app/blog/adduser";
     }
 
 }
