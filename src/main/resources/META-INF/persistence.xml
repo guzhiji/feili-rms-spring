@@ -7,13 +7,13 @@
              version="2.1">
     <persistence-unit name="myUnit" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
-        <class>com.feiliks.testapp2.jpa.entities.CheckPoint</class>
-        <class>com.feiliks.testapp2.jpa.entities.Request</class>
-        <class>com.feiliks.testapp2.jpa.entities.RequestType</class>
-        <class>com.feiliks.testapp2.jpa.entities.Requirement</class>
-        <class>com.feiliks.testapp2.jpa.entities.Tag</class>
-        <class>com.feiliks.testapp2.jpa.entities.User</class>
-        <class>com.feiliks.testapp2.blog.Blog</class>
+        <class>com.feiliks.rms.entities.CheckPoint</class>
+        <class>com.feiliks.rms.entities.Request</class>
+        <class>com.feiliks.rms.entities.RequestType</class>
+        <class>com.feiliks.rms.entities.Requirement</class>
+        <class>com.feiliks.rms.entities.Tag</class>
+        <class>com.feiliks.common.entities.User</class>
+        <class>com.feiliks.blog.Blog</class>
         <exclude-unlisted-classes/>
         <properties>
             <!--<property name="javax.persistence.jdbc.url" value="jdbc:derby://localhost:1527/sample"/>-->
@@ -25,7 +25,7 @@
             <property name="javax.persistence.jdbc.password" value="guzhiji"/>
             <!--<property name="javax.persistence.schema-generation.database.action" value="drop-and-create"/>-->
             <property name="hibernate.hbm2ddl.auto" value="update" />
-            <property name="hibernate.dialect" value="com.feiliks.testapp2.MySQLDialect" />
+            <property name="hibernate.dialect" value="com.feiliks.common.MySQLDialect" />
         </properties>
     </persistence-unit>
 </persistence>

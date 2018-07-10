@@ -40,7 +40,7 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 
     <task:annotation-driven />
     <tx:annotation-driven />
-    <context:component-scan base-package="com.feiliks.testapp2"  />
+    <context:component-scan base-package="com.feiliks"  />
     <!--<mvc:annotation-driven enable-matrix-variables="true" />-->
     <!-- <bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping" /> -->
 
@@ -63,7 +63,7 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" />
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <!--<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">-->
+        <!--<bean id="entityManagerFactory" class="org.springframework.orm.common.LocalEntityManagerFactoryBean">-->
         <property name="dataSource" ref="dataSource"/>
         <!--<property name="persistenceUnitName" value="myUnit" />-->
         <!--        <property name="loadTimeWeaver">
@@ -71,7 +71,7 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
         </property> -->
     </bean>
 
-    <!--    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <!--    <bean id="transactionManager" class="org.springframework.orm.common.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory" />
         <property name="persistenceUnitName" value="myUnit" />
         <property name="dataSource" ref="dataSource"/>
@@ -81,20 +81,20 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
         <property name="dataSource" ref="dataSource"/>
     </bean>
     -->
-    <!-- <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor"/> -->
+    <!-- <bean class="org.springframework.orm.common.support.PersistenceAnnotationBeanPostProcessor"/> -->
     <!-- <context:annotation-config /> -->
-    <!--<bean id="boxDAO" class="com.feiliks.testapp2.jpa.dao.BoxDAO" />-->
+    <!--<bean id="boxDAO" class="com.feiliks.testapp2.commonmon.dao.BoxDAO" />-->
 
-    <bean id="keyPairProvider" class="com.feiliks.testapp2.KeyPairProvider">
+    <bean id="keyPairProvider" class="com.feiliks.common.KeyPairProvider">
         <property name="sshPrivateKey" value="/home/guzhiji/Projects/keys/id_rsa"/>
         <property name="sshPublicKey" value="/home/guzhiji/Projects/keys/id_rsa.pub"/>
     </bean>
 
     <!-- <bean id="backgroundTasks" class="com.feiliks.testapp2.BackgroundTasks" /> -->
 
-    <jpa:repositories base-package="com.feiliks.testapp2.jpa.repositories" />
-
-    <jpa:repositories base-package="com.feiliks.testapp2.blog" />
+    <jpa:repositories base-package="com.feiliks.common.repositories" />
+    <jpa:repositories base-package="com.feiliks.rms.repositories" />
+    <jpa:repositories base-package="com.feiliks.blog" />
 
     <!--<mvc:resources mapping="/static/**" location="/static/" />-->
     <mvc:cors>
@@ -105,7 +105,7 @@ class="org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
             <mvc:mapping path="/**" />
             <mvc:exclude-mapping path="/account/login" />
             <mvc:exclude-mapping path="/blog/**" />
-            <bean class="com.feiliks.testapp2.TokenAuthInterceptor" />
+            <bean class="com.feiliks.common.TokenAuthInterceptor" />
         </mvc:interceptor>
     </mvc:interceptors>
     <mvc:annotation-driven />
