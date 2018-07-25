@@ -1,6 +1,7 @@
 package com.feiliks.common.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.feiliks.rms.entities.UserPermission;
 import com.feiliks.rms.entities.Request;
 import com.feiliks.rms.entities.RequestType;
 import com.feiliks.rms.entities.Requirement;
@@ -27,10 +28,6 @@ import javax.validation.constraints.Size;
 @Entity
 @Table(name = "rms_user")
 public class User implements Serializable {
-
-    public enum Permission {
-        ALL, MANAGE_REQUEST_TYPES, MANAGE_USERS
-    }
 
     private static final long serialVersionUID = 1L;
 
@@ -197,14 +194,14 @@ public class User implements Serializable {
     }
 
     @JsonIgnore
-    public Set<Permission> getPermissionsAsSet() {
-        Set<Permission> out = new HashSet<>();
+    public Set<UserPermission> getPermissionsAsSet() {
+        Set<UserPermission> out = new HashSet<>();
         if (permissions != null) {
             for (String p : permissions.split(",")) {
                 p = p.trim();
                 if (!p.isEmpty()) {
                     try {
-                        out.add(Permission.valueOf(p));
+                        out.add(UserPermission.valueOf(p));
                     } catch (IllegalArgumentException ex) {
                     }
                 }
@@ -214,13 +211,13 @@ public class User implements Serializable {
     }
 
     @JsonIgnore
-    public boolean hasPermissions(Permission... perms) {
-        Set<Permission> owned = getPermissionsAsSet();
-        if (owned.contains(Permission.ALL)) {
+    public boolean hasPermissions(UserPermission... perms) {
+        Set<UserPermission> owned = getPermissionsAsSet();
+        if (owned.contains(UserPermission.ALL)) {
             return true;
         }
-        List<Permission> required = new ArrayList<>(Arrays.asList(perms));
-        required.remove(Permission.ALL);
+        List<UserPermission> required = new ArrayList<>(Arrays.asList(perms));
+        required.remove(UserPermission.ALL);
         return owned.containsAll(required);
     }
 
@@ -232,9 +229,9 @@ public class User implements Serializable {
     }
 
     @JsonIgnore
-    public void setPermissions(Set<Permission> permissions) {
+    public void setPermissions(Set<UserPermission> permissions) {
         StringBuilder sb = new StringBuilder();
-        for (Permission p : permissions) {
+        for (UserPermission p : permissions) {
             if (sb.length() > 0) {
                 sb.append(',');
             }
@@ -244,7 +241,7 @@ public class User implements Serializable {
     }
 
     @JsonIgnore
-    public void setPermissions(Collection<Permission> permissions) {
+    public void setPermissions(Collection<UserPermission> permissions) {
         setPermissions(new HashSet<>(permissions));
     }
 

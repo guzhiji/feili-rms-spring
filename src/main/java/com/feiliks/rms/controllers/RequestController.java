@@ -4,7 +4,7 @@ import com.feiliks.common.AuthTokenUtil;
 import com.feiliks.common.AuthorizationException;
 import com.feiliks.common.NotFoundException;
 import com.feiliks.common.ValidationException;
-import com.feiliks.common.controllers.AbstractController;
+import com.feiliks.common.controllers.AbstractRestController;
 import com.feiliks.common.repositories.UserRepository;
 import com.feiliks.rms.JpaUtils;
 import com.feiliks.common.dto.EntityMessage;
@@ -29,7 +29,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/requests")
-public class RequestController extends AbstractController {
+public class RequestController extends AbstractRestController {
 
     @Autowired
     private RequestRepository repo;

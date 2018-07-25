@@ -1,7 +1,6 @@
-package com.feiliks.rms.controllers;
+package com.feiliks.common.controllers;
 
 import com.feiliks.common.*;
-import com.feiliks.common.controllers.AbstractController;
 import com.feiliks.common.dto.*;
 import com.feiliks.common.entities.User;
 import com.feiliks.common.repositories.UserRepository;
@@ -18,7 +17,7 @@ import java.io.IOException;
 
 @RestController
 @RequestMapping("/account")
-public class AccountController extends AbstractController {
+public class AccountController extends AbstractRestController {
 
     @Autowired
     private UserRepository userRepository;
@@ -60,6 +59,7 @@ public class AccountController extends AbstractController {
     }
 
     @PutMapping("/me")
+    @Transactional
     public ResponseEntity<Message> updateCurrentUser(
             HttpServletRequest req,
             @RequestBody @Valid UserDTO data,

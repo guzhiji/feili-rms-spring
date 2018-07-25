@@ -1,13 +1,13 @@
 package com.feiliks.rms.controllers;
 
-import com.feiliks.common.controllers.AbstractController;
+import com.feiliks.common.controllers.AbstractRestController;
 import com.feiliks.rms.JpaUtils;
 import com.feiliks.common.NotFoundException;
 import com.feiliks.common.ValidationException;
 import com.feiliks.common.dto.EntityMessage;
 import com.feiliks.rms.dto.RequestTypeDTO;
+import com.feiliks.rms.entities.UserPermission;
 import com.feiliks.rms.entities.RequestType;
-import com.feiliks.common.entities.User;
 import com.feiliks.rms.repositories.RequestTypeRepository;
 import com.feiliks.common.repositories.UserRepository;
 
@@ -29,7 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/request-types")
-public class RequestTypeController extends AbstractController {
+public class RequestTypeController extends AbstractRestController {
 
     @Autowired
     private RequestTypeRepository repo;
@@ -50,7 +50,7 @@ public class RequestTypeController extends AbstractController {
             @Valid @RequestBody RequestTypeDTO data,
             BindingResult validationResult) {
 
-        requiresPermissions(req, User.Permission.MANAGE_REQUEST_TYPES);
+        requiresPermissions(req, UserPermission.MANAGE_REQUEST_TYPES);
 
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult);
@@ -71,7 +71,7 @@ public class RequestTypeController extends AbstractController {
             @Valid @RequestBody RequestTypeDTO data,
             BindingResult validationResult) {
 
-        requiresPermissions(req, User.Permission.MANAGE_REQUEST_TYPES);
+        requiresPermissions(req, UserPermission.MANAGE_REQUEST_TYPES);
 
         if (validationResult.hasErrors()) {
             throw new ValidationException(validationResult);
@@ -105,7 +105,7 @@ public class RequestTypeController extends AbstractController {
             HttpServletRequest req,
             @PathVariable Long typeid) {
 
-        requiresPermissions(req, User.Permission.MANAGE_REQUEST_TYPES);
+        requiresPermissions(req, UserPermission.MANAGE_REQUEST_TYPES);
 
         RequestType entity = repo.findOne(typeid);
         if (entity == null) {

@@ -1,6 +1,7 @@
 package com.feiliks.common.dto;
 
-import com.feiliks.common.entities.User;
+import com.feiliks.rms.entities.UserPermission;
+
 import java.util.HashSet;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
@@ -24,10 +25,10 @@ public class PermissionsDTO {
         }
     }
 
-    public Set<User.Permission> getPermissionsAsSet() {
-        Set<User.Permission> pset = new HashSet<>();
+    public Set<UserPermission> getPermissionsAsSet() {
+        Set<UserPermission> pset = new HashSet<>();
         for (String p : permissions) {
-            pset.add(User.Permission.valueOf(p));
+            pset.add(UserPermission.valueOf(p));
         }
         return pset;
     }

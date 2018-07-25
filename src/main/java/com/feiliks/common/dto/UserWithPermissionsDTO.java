@@ -1,11 +1,13 @@
 package com.feiliks.common.dto;
 
 import com.feiliks.common.entities.User;
+import com.feiliks.rms.entities.UserPermission;
+
 import java.util.Set;
 
 public class UserWithPermissionsDTO extends UserDTO {
 
-    private Set<User.Permission> permissions;
+    private Set<UserPermission> permissions;
 
     public UserWithPermissionsDTO() {
     }
@@ -25,14 +27,14 @@ public class UserWithPermissionsDTO extends UserDTO {
     /**
      * @return the permissions
      */
-    public Set<User.Permission> getPermissions() {
+    public Set<UserPermission> getPermissions() {
         return permissions;
     }
 
     /**
      * @param permissions the permissions to set
      */
-    public void setPermissions(Set<User.Permission> permissions) {
+    public void setPermissions(Set<UserPermission> permissions) {
         this.permissions = permissions;
     }
 

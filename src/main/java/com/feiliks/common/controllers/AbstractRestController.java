@@ -7,6 +7,7 @@ import com.feiliks.common.ValidationException;
 import com.feiliks.common.dto.EntityMessage;
 import com.feiliks.common.dto.Message;
 import com.feiliks.common.entities.User;
+import com.feiliks.rms.entities.UserPermission;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,7 +21,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-abstract public class AbstractController {
+abstract public class AbstractRestController {
 
     @ExceptionHandler(NotFoundException.class)
     protected ResponseEntity<Message> handleNotFound(NotFoundException ex) {
@@ -55,7 +56,7 @@ abstract public class AbstractController {
         return ResponseEntity.created(uri).body(msg);
     }
 
-    protected void requiresPermissions(HttpServletRequest req, User.Permission... perms) {
+    protected void requiresPermissions(HttpServletRequest req, UserPermission... perms) {
         User curUser = AuthTokenUtil.getUser(req);
         if (!curUser.hasPermissions(perms)) {
             throw new AuthorizationException();

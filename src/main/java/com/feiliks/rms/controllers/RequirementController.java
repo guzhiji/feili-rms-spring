@@ -4,7 +4,7 @@ import com.feiliks.common.AuthTokenUtil;
 import com.feiliks.common.AuthorizationException;
 import com.feiliks.common.NotFoundException;
 import com.feiliks.common.ValidationException;
-import com.feiliks.common.controllers.AbstractController;
+import com.feiliks.common.controllers.AbstractRestController;
 import com.feiliks.rms.JpaUtils;
 import com.feiliks.rms.dto.CheckPointStatusDTO;
 import com.feiliks.common.dto.EntityMessage;
@@ -45,7 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RestController
 @RequestMapping("/requirements")
-public class RequirementController extends AbstractController {
+public class RequirementController extends AbstractRestController {
 
     @Autowired
     private RequirementRepository repo;

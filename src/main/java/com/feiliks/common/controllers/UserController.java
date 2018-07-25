@@ -6,6 +6,7 @@ import com.feiliks.common.PasswordUtil;
 import com.feiliks.common.ValidationException;
 import com.feiliks.common.dto.*;
 import com.feiliks.rms.dto.*;
+import com.feiliks.rms.entities.UserPermission;
 import com.feiliks.rms.entities.Request;
 import com.feiliks.rms.entities.RequestType;
 import com.feiliks.rms.entities.Requirement;
@@ -25,7 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-class UserController extends AbstractController {
+class UserController extends AbstractRestController {
 
     @Autowired
     private UserRepository userRepository;
@@ -56,7 +57,7 @@ class UserController extends AbstractController {
             HttpServletRequest req,
             @RequestBody @Valid User data,
             BindingResult bindingResult) {
-        requiresPermissions(req, User.Permission.MANAGE_USERS);
+        requiresPermissions(req, UserPermission.MANAGE_USERS);
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
@@ -76,7 +77,7 @@ class UserController extends AbstractController {
             @PathVariable Long userid,
             @RequestBody @Valid UserDTO data,
             BindingResult bindingResult) {
-        requiresPermissions(req, User.Permission.MANAGE_USERS);
+        requiresPermissions(req, UserPermission.MANAGE_USERS);
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
@@ -96,7 +97,7 @@ class UserController extends AbstractController {
             @PathVariable Long userid,
             @RequestBody @Valid PasswordDTO data,
             BindingResult bindingResult) {
-        requiresPermissions(req, User.Permission.MANAGE_USERS);
+        requiresPermissions(req, UserPermission.MANAGE_USERS);
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
@@ -114,7 +115,7 @@ class UserController extends AbstractController {
             @PathVariable Long userid,
             @RequestBody @Valid PermissionsDTO data,
             BindingResult bindingResult) {
-        requiresPermissions(req, User.Permission.MANAGE_USERS);
+        requiresPermissions(req, UserPermission.MANAGE_USERS);
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult);
         }
@@ -182,7 +183,7 @@ class UserController extends AbstractController {
     @DeleteMapping("/{userid}")
     @Transactional
     public ResponseEntity<?> deleteUser(HttpServletRequest req, @PathVariable Long userid) {
-        requiresPermissions(req, User.Permission.MANAGE_USERS);
+        requiresPermissions(req, UserPermission.MANAGE_USERS);
         userRepository.delete(getUserOrRaiseEx(userid));
         return ResponseEntity.noContent().build();
     }
