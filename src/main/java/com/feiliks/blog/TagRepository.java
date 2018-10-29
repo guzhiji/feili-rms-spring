@@ -1,6 +1,5 @@
-package com.feiliks.rms.repositories;
+package com.feiliks.blog;
 
-import com.feiliks.rms.entities.Tag;
 import java.util.Collection;
 import org.springframework.data.repository.CrudRepository;
 

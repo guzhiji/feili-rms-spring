@@ -1,6 +1,5 @@
 package com.feiliks.blog;
 
-import com.feiliks.rms.entities.Tag;
 import com.feiliks.common.entities.User;
 import java.io.Serializable;
 import java.util.Collection;
@@ -21,8 +20,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+
 @Entity
-@Table(name = "blog")
+@Table(name = "blog_blog")
 @NamedQueries({
     @NamedQuery(
             name = "Blog.findPublished",

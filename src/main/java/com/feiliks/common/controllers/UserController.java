@@ -5,12 +5,8 @@ import com.feiliks.common.NotFoundException;
 import com.feiliks.common.PasswordUtil;
 import com.feiliks.common.ValidationException;
 import com.feiliks.common.dto.*;
-import com.feiliks.rms.dto.*;
-import com.feiliks.rms.entities.UserPermission;
-import com.feiliks.rms.entities.Request;
-import com.feiliks.rms.entities.RequestType;
-import com.feiliks.rms.entities.Requirement;
 import com.feiliks.common.entities.User;
+import com.feiliks.common.entities.UserPermission;
 import com.feiliks.common.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,8 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/users")
@@ -124,52 +120,6 @@ class UserController extends AbstractRestController {
         userRepository.save(entity);
         Message msg = new Message("success", "Permissions are updated.");
         return ResponseEntity.accepted().body(msg);
-    }
-
-    @GetMapping("/{userid}/requests")
-    @Transactional(readOnly = true)
-    public List<RequestDTO> getOwnedRequests(
-            HttpServletRequest req,
-            @PathVariable Long userid) {
-        User owner = getUserOrRaiseEx(userid);
-        List<RequestDTO> out = new ArrayList<>();
-        for (Request r : owner.getRequestsOwned()) {
-            out.add(new RequestDTO(r));
-        }
-        return out;
-    }
-
-    @GetMapping("/{userid}/request-types")
-    @Transactional(readOnly = true)
-    public EntityMessage<List<RequestTypeDTO>> getManagedRequestTypes(
-            HttpServletRequest req,
-            @PathVariable Long userid) {
-        User owner = getUserOrRaiseEx(userid);
-        return respondListWithType(
-                owner.getRequestTypesManaged(),
-                RequestType.class, RequestTypeDTO.class);
-    }
-
-    @GetMapping("/{userid}/requirements/owned")
-    @Transactional(readOnly = true)
-    public EntityMessage<List<RequirementDTO>> getOwnedRequirements(
-            HttpServletRequest req,
-            @PathVariable Long userid) {
-        User owner = getUserOrRaiseEx(userid);
-        return respondListWithType(
-                owner.getRequirementsOwned(),
-                Requirement.class, RequirementDTO.class);
-    }
-
-    @GetMapping("/{userid}/requirements/participated")
-    @Transactional(readOnly = true)
-    public EntityMessage<List<RequirementDTO>> getParticipatedRequirements(
-            HttpServletRequest req,
-            @PathVariable Long userid) {
-        User owner = getUserOrRaiseEx(userid);
-        return respondListWithType(
-                owner.getRequirementsParticipated(),
-                Requirement.class, RequirementDTO.class);
     }
 
     @GetMapping("/{userid}")

@@ -1,4 +1,4 @@
-package com.feiliks.rms.entities;
+package com.feiliks.blog;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -12,9 +12,10 @@ import javax.persistence.Table;
 import javax.persistence.NamedQuery;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+
 @Entity
-@Table(name = "rms_tag")
-@NamedQuery(name = "Tag.findOrphaned", query = "select t from Tag t where size(t.requirements) = 0")
+@Table(name = "blog_tag")
+@NamedQuery(name = "Tag.findOrphaned", query = "select t from Tag t where size(t.blogs) = 0")
 public class Tag implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -28,7 +29,7 @@ public class Tag implements Serializable {
 
     @ManyToMany(mappedBy = "tags")
     @JsonIgnore
-    private Collection<Requirement> requirements;
+    private Collection<Blog> blogs;
 
     public Tag() {
     }
@@ -80,17 +81,17 @@ public class Tag implements Serializable {
     }
 
     /**
-     * @return the requirements
+     * @return the blogs
      */
-    public Collection<Requirement> getRequirements() {
-        return requirements;
+    public Collection<Blog> getBlogs() {
+        return blogs;
     }
 
     /**
-     * @param requirements the requirements to set
+     * @param blogs the blogs to set
      */
-    public void setRequirements(Collection<Requirement> requirements) {
-        this.requirements = requirements;
+    public void setBlogs(Collection<Blog> blogs) {
+        this.blogs = blogs;
     }
 
     @Override

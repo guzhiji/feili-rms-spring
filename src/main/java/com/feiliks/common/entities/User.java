@@ -1,29 +1,15 @@
 package com.feiliks.common.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.feiliks.rms.entities.UserPermission;
-import com.feiliks.rms.entities.Request;
-import com.feiliks.rms.entities.RequestType;
-import com.feiliks.rms.entities.Requirement;
+import com.feiliks.blog.Blog;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Column;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.*;
+
 
 @Entity
 @Table(name = "rms_user")
@@ -55,21 +41,9 @@ public class User implements Serializable {
     @JsonIgnore
     private String permissions;
 
-    @ManyToMany(mappedBy = "participants")
-    @JsonIgnore
-    private Set<Requirement> requirementsParticipated;
-
     @OneToMany(mappedBy = "owner")
     @JsonIgnore
-    private Set<Requirement> requirementsOwned;
-
-    @OneToMany(mappedBy = "owner")
-    @JsonIgnore
-    private Set<Request> requestsOwned;
-
-    @OneToMany(mappedBy = "manager")
-    @JsonIgnore
-    private Set<RequestType> requestTypesManaged;
+    private Set<Blog> blogs;
 
     /**
      * @return the id
@@ -131,59 +105,17 @@ public class User implements Serializable {
     }
 
     /**
-     * @return the requirementsParticipated
+     * @return the blogs
      */
-    public Set<Requirement> getRequirementsParticipated() {
-        return requirementsParticipated;
+    public Set<Blog> getBlogs() {
+        return blogs;
     }
 
     /**
-     * @param requirementsParticipated the requirementsParticipated to set
+     * @param blogs the blogs to set
      */
-    public void setRequirementsParticipated(Set<Requirement> requirementsParticipated) {
-        this.requirementsParticipated = requirementsParticipated;
-    }
-
-    /**
-     * @return the requirementsOwned
-     */
-    public Set<Requirement> getRequirementsOwned() {
-        return requirementsOwned;
-    }
-
-    /**
-     * @param requirementsOwned the requirementsOwned to set
-     */
-    public void setRequirementsOwned(Set<Requirement> requirementsOwned) {
-        this.requirementsOwned = requirementsOwned;
-    }
-
-    /**
-     * @return the requestsOwned
-     */
-    public Set<Request> getRequestsOwned() {
-        return requestsOwned;
-    }
-
-    /**
-     * @param requestsOwned the requestsOwned to set
-     */
-    public void setRequestsOwned(Set<Request> requestsOwned) {
-        this.requestsOwned = requestsOwned;
-    }
-
-    /**
-     * @return the requestTypesManaged
-     */
-    public Set<RequestType> getRequestTypesManaged() {
-        return requestTypesManaged;
-    }
-
-    /**
-     * @param requestTypesManaged the requestTypesManaged to set
-     */
-    public void setRequestTypesManaged(Set<RequestType> requestTypesManaged) {
-        this.requestTypesManaged = requestTypesManaged;
+    public void setBlogs(Set<Blog> blogs) {
+        this.blogs = blogs;
     }
 
     /**

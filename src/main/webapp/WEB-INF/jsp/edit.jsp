@@ -7,11 +7,11 @@
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Edit: ${blog.title}</title>
-        <link rel="stylesheet" href="http://localhost:8080/rms-spring-app-0.1.0/css/foundation.css">
-        <link rel="stylesheet" href="http://localhost:8080/rms-spring-app-0.1.0/css/app.css">
-        <script type="text/javascript" charset="utf-8" src="/rms-spring-app-0.1.0/ueditor/ueditor.config.js"></script>
-        <script type="text/javascript" charset="utf-8" src="/rms-spring-app-0.1.0/ueditor/ueditor.all.min.js"></script>
-        <script type="text/javascript" charset="utf-8" src="/rms-spring-app-0.1.0/ueditor/lang/zh-cn/zh-cn.js"></script>
+        <link rel="stylesheet" href="/css/foundation.css">
+        <link rel="stylesheet" href="/css/app.css">
+        <script type="text/javascript" charset="utf-8" src="/ueditor/ueditor.config.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/ueditor/ueditor.all.min.js"></script>
+        <script type="text/javascript" charset="utf-8" src="/ueditor/lang/zh-cn/zh-cn.js"></script>
     </head>
     <body>
         <div class="top-bar">
@@ -88,9 +88,9 @@
                 </div>
             </div>
         </div>
-        <script src="http://localhost:8080/rms-spring-app-0.1.0/js/vendor/jquery.js"></script>
-        <script src="http://localhost:8080/rms-spring-app-0.1.0/js/vendor/what-input.js"></script>
-        <script src="http://localhost:8080/rms-spring-app-0.1.0/js/vendor/foundation.js"></script>
-        <script src="http://localhost:8080/rms-spring-app-0.1.0/js/app.js"></script>
+        <script src="/js/vendor/jquery.js"></script>
+        <script src="/js/vendor/what-input.js"></script>
+        <script src="/js/vendor/foundation.js"></script>
+        <script src="/js/app.js"></script>
     </body>
 </html>

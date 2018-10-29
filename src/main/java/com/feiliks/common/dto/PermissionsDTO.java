@@ -1,6 +1,6 @@
 package com.feiliks.common.dto;
 
-import com.feiliks.rms.entities.UserPermission;
+import com.feiliks.common.entities.UserPermission;
 
 import java.util.HashSet;
 import java.util.Set;

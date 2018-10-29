@@ -1,7 +1,7 @@
 package com.feiliks.common.dto;
 
 import com.feiliks.common.entities.User;
-import com.feiliks.rms.entities.UserPermission;
+import com.feiliks.common.entities.UserPermission;
 
 import java.util.Set;
 
