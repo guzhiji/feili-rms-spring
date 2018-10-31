@@ -2,5 +2,5 @@
 
 cd `dirname "$0"`
 # JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
-mvn spring-boot:run -Drun.arguments="superuser,admin,feiliks"
+mvn spring-boot:run -Dspring-boot.run.arguments="superuser,admin,feiliks"
 
