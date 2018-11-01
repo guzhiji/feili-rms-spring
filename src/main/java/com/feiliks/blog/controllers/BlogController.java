@@ -1,5 +1,10 @@
-package com.feiliks.blog;
+package com.feiliks.blog.controllers;
 
+import com.feiliks.blog.dto.BlogDTO;
+import com.feiliks.blog.entities.Blog;
+import com.feiliks.blog.entities.Tag;
+import com.feiliks.blog.repositories.BlogRepository;
+import com.feiliks.blog.repositories.TagRepository;
 import com.feiliks.common.AuthorizationException;
 import com.feiliks.common.NotFoundException;
 import com.feiliks.common.PasswordUtil;
@@ -12,8 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 import com.feiliks.common.dto.LoginDTO;
 import com.feiliks.common.dto.PasswordDTO;
-import com.feiliks.common.entities.User;
-import com.feiliks.common.repositories.UserRepository;
+import com.feiliks.blog.entities.User;
+import com.feiliks.blog.repositories.UserRepository;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;

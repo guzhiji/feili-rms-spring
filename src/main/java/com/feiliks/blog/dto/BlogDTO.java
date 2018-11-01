@@ -1,6 +1,7 @@
-package com.feiliks.blog;
+package com.feiliks.blog.dto;
 
-import com.feiliks.common.dto.UserDTO;
+import com.feiliks.blog.entities.Blog;
+import com.feiliks.blog.entities.Tag;
 
 import java.util.Date;
 import java.util.HashSet;

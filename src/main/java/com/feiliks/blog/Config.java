@@ -14,14 +14,12 @@ import javax.sql.DataSource;
 
 @Configuration
 @EntityScan(basePackages = {
-        "com.feiliks.blog",
-        "com.feiliks.common.entities"})
+        "com.feiliks.blog.entities"})
 @ComponentScan(basePackages = {
-        "com.feiliks.blog",
-        "com.feiliks.controllers"})
+        "com.feiliks.blog.controllers",
+        "com.feiliks.blog.commandline"})
 @EnableJpaRepositories(basePackages = {
-        "com.feiliks.blog",
-        "com.feiliks.common.repositories"})
+        "com.feiliks.blog.repositories"})
 public class Config {
 
     @Bean

@@ -1,6 +1,7 @@
-package com.feiliks.blog;
+package com.feiliks.blog.repositories;
 
-import com.feiliks.common.entities.User;
+import com.feiliks.blog.entities.Blog;
+import com.feiliks.blog.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.PagingAndSortingRepository;

@@ -1,9 +1,9 @@
-package com.feiliks.blog;
+package com.feiliks.blog.commandline;
 
 import com.feiliks.common.PasswordUtil;
-import com.feiliks.common.entities.User;
-import com.feiliks.common.entities.UserPermission;
-import com.feiliks.common.repositories.UserRepository;
+import com.feiliks.blog.entities.User;
+import com.feiliks.blog.entities.UserPermission;
+import com.feiliks.blog.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

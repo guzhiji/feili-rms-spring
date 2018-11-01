@@ -1,6 +1,5 @@
-package com.feiliks.blog;
+package com.feiliks.blog.entities;
 
-import com.feiliks.common.entities.User;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;

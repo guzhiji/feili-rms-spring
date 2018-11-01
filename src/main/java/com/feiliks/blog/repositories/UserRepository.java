@@ -1,11 +1,11 @@
-package com.feiliks.common.repositories;
+package com.feiliks.blog.repositories;
 
-import com.feiliks.common.entities.User;
+import com.feiliks.blog.entities.User;
 import org.springframework.data.repository.CrudRepository;
 
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    public User findByUsername(String username);
+    User findByUsername(String username);
 
     boolean existsByUsername(String username);
 }

@@ -1,4 +1,4 @@
-package com.feiliks.blog;
+package com.feiliks.blog.entities;
 
 import java.io.Serializable;
 import java.util.Collection;

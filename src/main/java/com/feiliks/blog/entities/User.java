@@ -1,7 +1,6 @@
-package com.feiliks.common.entities;
+package com.feiliks.blog.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.feiliks.blog.Blog;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
