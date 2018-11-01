@@ -1,7 +1,7 @@
 package com.feiliks.rms.repositories;
 
 import com.feiliks.rms.entities.Requirement;
-import com.feiliks.common.entities.User;
+import com.feiliks.rms.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

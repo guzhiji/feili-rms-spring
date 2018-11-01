@@ -6,7 +6,7 @@ import com.feiliks.common.NotFoundException;
 import com.feiliks.common.ValidationException;
 import com.feiliks.common.dto.EntityMessage;
 import com.feiliks.common.dto.Message;
-import com.feiliks.common.entities.User;
+import com.feiliks.rms.entities.User;
 import com.feiliks.rms.entities.UserPermission;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

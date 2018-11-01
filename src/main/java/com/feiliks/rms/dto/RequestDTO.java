@@ -1,6 +1,5 @@
 package com.feiliks.rms.dto;
 
-import com.feiliks.common.dto.UserDTO;
 import com.feiliks.rms.entities.Request;
 import java.util.Date;
 import javax.validation.constraints.NotNull;

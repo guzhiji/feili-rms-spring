@@ -1,17 +1,18 @@
-package com.feiliks.common.controllers;
+package com.feiliks.rms.controllers;
 
 import com.feiliks.common.AlreadyExistsException;
 import com.feiliks.common.NotFoundException;
 import com.feiliks.common.PasswordUtil;
 import com.feiliks.common.ValidationException;
+import com.feiliks.common.controllers.AbstractRestController;
 import com.feiliks.common.dto.*;
 import com.feiliks.rms.dto.*;
 import com.feiliks.rms.entities.UserPermission;
 import com.feiliks.rms.entities.Request;
 import com.feiliks.rms.entities.RequestType;
 import com.feiliks.rms.entities.Requirement;
-import com.feiliks.common.entities.User;
-import com.feiliks.common.repositories.UserRepository;
+import com.feiliks.rms.entities.User;
+import com.feiliks.rms.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.feiliks.common.dto;
+package com.feiliks.rms.dto;
 
 import com.feiliks.rms.entities.UserPermission;
 

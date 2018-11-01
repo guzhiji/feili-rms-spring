@@ -1,10 +1,6 @@
-package com.feiliks.common.entities;
+package com.feiliks.rms.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.feiliks.rms.entities.UserPermission;
-import com.feiliks.rms.entities.Request;
-import com.feiliks.rms.entities.RequestType;
-import com.feiliks.rms.entities.Requirement;
 
 import java.io.Serializable;
 import java.util.ArrayList;

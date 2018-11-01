@@ -1,7 +1,6 @@
 package com.feiliks.rms.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.feiliks.common.entities.User;
 
 import java.io.Serializable;
 import java.util.Date;

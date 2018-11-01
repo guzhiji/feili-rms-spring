@@ -1,11 +1,10 @@
 package com.feiliks.rms.dto;
 
-import com.feiliks.common.dto.UserDTO;
 import com.feiliks.rms.entities.CheckPoint;
 import com.feiliks.rms.entities.Request;
 import com.feiliks.rms.entities.Requirement;
 import com.feiliks.rms.entities.Tag;
-import com.feiliks.common.entities.User;
+import com.feiliks.rms.entities.User;
 
 import java.util.*;
 import javax.validation.constraints.NotNull;

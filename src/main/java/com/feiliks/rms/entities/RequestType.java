@@ -1,7 +1,5 @@
 package com.feiliks.rms.entities;
 
-import com.feiliks.common.entities.User;
-
 import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;

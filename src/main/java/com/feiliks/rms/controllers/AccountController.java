@@ -1,9 +1,12 @@
-package com.feiliks.common.controllers;
+package com.feiliks.rms.controllers;
 
 import com.feiliks.common.*;
+import com.feiliks.common.controllers.AbstractRestController;
 import com.feiliks.common.dto.*;
-import com.feiliks.common.entities.User;
-import com.feiliks.common.repositories.UserRepository;
+import com.feiliks.rms.dto.UserDTO;
+import com.feiliks.rms.dto.UserWithPermissionsDTO;
+import com.feiliks.rms.entities.User;
+import com.feiliks.rms.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

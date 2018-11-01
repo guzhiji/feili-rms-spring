@@ -9,7 +9,7 @@ import com.feiliks.rms.dto.RequestTypeDTO;
 import com.feiliks.rms.entities.UserPermission;
 import com.feiliks.rms.entities.RequestType;
 import com.feiliks.rms.repositories.RequestTypeRepository;
-import com.feiliks.common.repositories.UserRepository;
+import com.feiliks.rms.repositories.UserRepository;
 
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;

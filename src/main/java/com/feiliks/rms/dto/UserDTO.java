@@ -1,6 +1,6 @@
-package com.feiliks.common.dto;
+package com.feiliks.rms.dto;
 
-import com.feiliks.common.entities.User;
+import com.feiliks.rms.entities.User;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;

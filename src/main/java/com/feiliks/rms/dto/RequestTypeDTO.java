@@ -1,6 +1,5 @@
 package com.feiliks.rms.dto;
 
-import com.feiliks.common.dto.UserDTO;
 import com.feiliks.rms.entities.RequestType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
